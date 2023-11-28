@@ -1,0 +1,10 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+	transition:
+		background-color 0.2s ease-in-out,
+		color 0.2s ease-in-out;
+	@apply bg-white text-center text-black dark:bg-black dark:text-white;
+}
