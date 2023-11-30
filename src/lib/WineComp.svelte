@@ -156,7 +156,7 @@
 </script>
 
 <div class="mb-8 flex flex-col">
-	<h3 class="text-lg font-medium mb-2 text-amber-600">
+	<h3 class="text-lg font-medium mb-2 left-0 text-amber-600">
 		Name: {wine["Wine Name"]}<br />Vineyard Location: {wine["Vineyard Location"]}<br />Variety: {wine.Variety
 			? `(${wine.Variety})`
 			: ""}

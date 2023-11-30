@@ -1,7 +1,9 @@
 <script lang='ts'>
+	import { browser } from '$app/environment';
 	import ThemeSwitch from '$lib/ThemeSwitch/ThemeSwitch.svelte';
 	import { myWineCellar, ownedWinesString } from "$lib/store.js";
 	import type { Cellar, Wine } from '$lib/types';
+	import { localStorageStore } from '@skeletonlabs/skeleton';
 	import
 		{
 			Button,
@@ -19,7 +21,7 @@
  
  // import EventTarget from 'svelte';
 
- 	
+ 	const storeExample: Writable<string> = localStorageStore('storeExample', 'initialValueHere');
   const eventListenerStore: Writable<EventTarget> = writable();
 
 	setContext('eventListener', eventListenerStore);
@@ -44,7 +46,7 @@
 
 		for (let i = 0; localStorage && i < localStorage.length; i++) {
 			const key = localStorage.key(i) || "[]";
-			if (key && key !== "theme" && key !== "_localization" ) {
+			if (key && key !== "theme" && key !== "_localization" && key !== "storeExample" ) {
 				const values = localStorage.getItem(key);
 				console.log("loadfromstorage key " + key);
 				if (values) {
@@ -66,6 +68,7 @@ function handleWinesUpdated() {
 		console.log("handleWinesUpdated (App.svelte) called loading from local storage");
 		$myWineCellar.updateCellar(tempCellar);
 		$ownedWinesString = JSON.stringify(tempCellar);
+		if (browser) $storeExample=JSON.stringify(tempCellar);
 		updateDDLs();
 	}
 
@@ -78,7 +81,12 @@ function handleWinesUpdated() {
 	}
 
 	function updateDDLs() {
-		console.log("updateDDLs called");
+		console.log("updateDDLs called  - reseting searchParams");
+		searchParams = {
+			producer: [{ name: "All Producers", value: "" }],
+			variety: [{ name: "All Varieties", value: "" }],
+			vineyard: [{ name: "All Vineyards", value: "" }]
+		};
 		addOptions("producer", $myWineCellar.getProducerNames());
 		addOptions("variety", $myWineCellar.getVarietyNames());
 		addOptions("vineyard", $myWineCellar.getVineyardNames());
@@ -144,8 +152,10 @@ function handleWinesUpdated() {
 		//dispatch("wineUpdated", { detail: "wineUpdated" });
 	}
 
-$: if (cellar) $ownedWinesString = JSON.stringify(cellar);
-
+$: if (cellar) {
+	$ownedWinesString = JSON.stringify(cellar);
+	if (browser) $storeExample=JSON.stringify(cellar);
+}
 
 	$: eventListenerStore.subscribe((eventListener) => {
     if (eventListener) {
@@ -156,7 +166,11 @@ $: if (cellar) $ownedWinesString = JSON.stringify(cellar);
     }
   });
 
-
+  $: {
+	//console.log($storeExample);
+	if(browser&&localStorage.getItem('storeExample') === null){
+	//console.log(localStorage.getItem('storeExample'));
+  }}
 </script>
 
 <Modal title="Import Wines" bind:open={importModal} autoclose>

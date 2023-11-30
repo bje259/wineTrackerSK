@@ -73,6 +73,7 @@ export class WineCellar {
 	addWine(producer: string, wine: Wine): void {
 		const existingWine: Wine[] = this.cellar[producer] || [];
 		this.cellar[producer] = [...existingWine, wine];
+		
 	}
 
 	/**

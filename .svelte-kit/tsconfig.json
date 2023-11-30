@@ -6,6 +6,18 @@
 			],
 			"$lib/*": [
 				"../src/lib/*"
+			],
+			"$components": [
+				"../$lib/components"
+			],
+			"$components/*": [
+				"../$lib/components/*"
+			],
+			"$utils": [
+				"../$lib/utils"
+			],
+			"$utils/*": [
+				"../$lib/utils/*"
 			]
 		},
 		"rootDirs": [

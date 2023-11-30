@@ -60,6 +60,14 @@ function clearSearch(setter: (value: string) => void): void {
 		updateDDLs();
 	});
 
+/**
+ * Delete all wines from a producer
+ * @param producer The producer to delete
+ * @returns void
+ * @example
+ * deleteProducer("Chateau de la Tour");
+ * // Deletes all wines from Chateau de la Tour
+*/
 	function deleteProducer(producer: string) {
 		console.log("deleteProducer called");
 		console.log(producer);
@@ -85,7 +93,12 @@ function clearSearch(setter: (value: string) => void): void {
 	}
 
 	function updateDDLs() {
-		console.log("updateDDLs called");
+		console.log("updateDDLs called  - reseting searchParams");
+		searchParams = {
+			producer: [{ name: "All Producers", value: "" }],
+			variety: [{ name: "All Varieties", value: "" }],
+			vineyard: [{ name: "All Vineyards", value: "" }]
+		};
 		addOptions("producer", $myWineCellar.getProducerNames());
 		addOptions("variety", $myWineCellar.getVarietyNames());
 		addOptions("vineyard", $myWineCellar.getVineyardNames());
@@ -98,14 +111,16 @@ function clearSearch(setter: (value: string) => void): void {
 			searchParams[paramKey] = [...searchParams[paramKey], ...newOptions];
 		} else {
 			// Optionally handle the case where the paramKey does not exist
+			searchParams[paramKey] = newOptions;
+
 		}
 	}
 	function loadOwnedWinesFromLocalStorage(): Cellar {
 		const loadedOwnedWines: Cellar = {};
 
-		for (let i = 0; i < localStorage.length; i++) {
-			const key = localStorage.key(i);
-			if (key && key !== "theme" && key !== "_localization" ){
+		for (let i = 0; localStorage && i < localStorage.length; i++) {
+			const key = localStorage.key(i) || "[]";
+			if (key && key !== "theme" && key !== "_localization" && key !== "storeExample" ) {
 				const values = localStorage.getItem(key);
 				console.log("loadfromstorage key " + key);
 				if (values) {
@@ -192,7 +207,7 @@ $: {
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 		{#if Object.keys(cellar).length > 0}
 			{#each Object.keys(cellar) as producer (producer)}
-				<div class="mb-8 flex flex-col">
+				<div class="mb-8 flex flex-col justify-items-start">
 					<h1 class="text-2xl text-cyan-500 font-medium mb-4">
 						{producer}
 					</h1>
