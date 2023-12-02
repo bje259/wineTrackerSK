@@ -8,7 +8,9 @@ import type { Cellar, Wine } from './types';
  * @see WineCellar
  * @example
  */
-
+function isIterable(obj) {
+	return obj != null && typeof obj[Symbol.iterator] === 'function';
+}
 export class WineCellar {
 	cellar: Cellar;
 
@@ -73,7 +75,6 @@ export class WineCellar {
 	addWine(producer: string, wine: Wine): void {
 		const existingWine: Wine[] = this.cellar[producer] || [];
 		this.cellar[producer] = [...existingWine, wine];
-		
 	}
 
 	/**
@@ -338,6 +339,7 @@ export class WineCellar {
 	 */
 	getProducerNames(): { name: string; value: string }[] {
 		const producers = [];
+		if (!isIterable(producers)) return [];
 		for (const producer in this.cellar) {
 			producers.push({ name: producer, value: producer });
 		}
@@ -354,6 +356,7 @@ export class WineCellar {
 	getVarietyNames(): { name: string; value: string }[] {
 		const varieties = [];
 		for (const producer in this.cellar) {
+			if (!isIterable(this.cellar[producer])) continue;
 			for (const wine of this.cellar[producer]) {
 				if (wine.Variety) {
 					varieties.push({ name: wine.Variety, value: wine.Variety });
@@ -373,6 +376,7 @@ export class WineCellar {
 	getVineyardNames(): { name: string; value: string }[] {
 		const vineyards = [];
 		for (const producer in this.cellar) {
+			if (!isIterable(this.cellar[producer])) continue;
 			for (const wine of this.cellar[producer]) {
 				if (wine['Vineyard Location']) {
 					vineyards.push({ name: wine['Vineyard Location'], value: wine['Vineyard Location'] });
@@ -567,6 +571,14 @@ export class WineCellar {
 	updateCellar(cellar: Cellar): void {
 		this.cellar = cellar;
 		console.log(this.cellar);
+	}
+
+	/**
+	 * Retrieves the number of producers in the cellar.
+	 * @returns The number of producers in the cellar.
+	 */
+	getProducerCount(): number {
+		return Object.keys(this.cellar).length;
 	}
 
 	// Additional utility methods can be added as needed
