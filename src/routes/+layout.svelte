@@ -44,6 +44,7 @@ let transitionParams = {
 	easing: sineIn
 };
 
+//todo update imports and declarations for wineflat
 // import EventTarget from 'svelte';
 
 const storeExample: Writable<string> = localStorageStore('storeExample', 'initialValueHere');
@@ -80,6 +81,7 @@ function isIterable(obj) {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
 
+//todo update to use wineflat
 function loadOwnedWinesInitial(): Cellar {
 	const loadedOwnedWines: Cellar = {};
 	let count = 0;
@@ -110,6 +112,7 @@ $: if (browser && !initialQuickload) {
 	$myWineCellar.updateCellar(loadOwnedWinesInitial());
 	invalidateAll();
 }
+//todo update to use wineflat
 function loadOwnedWinesFromLocalStorage(): Cellar {
 	const loadedOwnedWines: Cellar = {};
 	if (debugMode) return loadedOwnedWines;
@@ -133,6 +136,7 @@ function loadOwnedWinesFromLocalStorage(): Cellar {
 	console.log(loadedOwnedWines);
 	return loadedOwnedWines;
 }
+//todo update to use wineflat
 function handleWinesUpdated() {
 	// Update the local data or trigger a refresh
 	let tempCellar: Cellar = loadOwnedWinesFromLocalStorage();
@@ -142,7 +146,7 @@ function handleWinesUpdated() {
 	//if (browser) $storeExample = JSON.stringify(tempCellar);
 	updateDDLs();
 }
-
+//todo update to use wineflat, make match +page version
 function addOptions(paramKey: string, newOptions: { name: string; value: string }[]) {
 	if (searchParams[paramKey]) {
 		searchParams[paramKey] = [...searchParams[paramKey], ...newOptions];
@@ -150,7 +154,7 @@ function addOptions(paramKey: string, newOptions: { name: string; value: string 
 		// Optionally handle the case where the paramKey does not exist
 	}
 }
-
+//todo update to use wineflat
 function updateDDLs() {
 	console.log('updateDDLs called  - reseting searchParams');
 	searchParams = {
@@ -210,13 +214,13 @@ function copyText(_e: MouseEvent): void {
 	navigator.clipboard
 		.writeText($ownedWinesString)
 		.then(() => {
-			alert('Copied Aspects to Clipboard');
+			alert('Copied wines to Clipboard');
 		})
 		.catch(() => {
 			alert('something went wrong');
 		});
 }
-
+//todo update to use wineflat
 function loadPreset() {
 	//$myWineCellar.updateCellar(presetList);
 	// Save owned Wines to local storage
@@ -247,7 +251,7 @@ $: eventListenerStore.subscribe((eventListener) => {
 	}
 });
 </script>
-
+<!--tododecide if drawer is needed for production potential make it dev tools using secret localstorage value-->
 <Drawer
 	transitionType="fly"
 	transitionParams={transitionParams}
@@ -384,7 +388,7 @@ $: eventListenerStore.subscribe((eventListener) => {
 		><LightSwitch fillLight="fill-surface-50" fillDark="fill-surface-900" /></svelte:fragment
 	>
 </AppBar>
-
+<!--todo potentially make conditional on devcode in local storage-->
 <div class=" ml-3 mt-2">
 	<Button on:click={() => (hidden2 = false)}>Show navigation</Button>
 </div>

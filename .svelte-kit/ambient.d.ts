@@ -29,7 +29,6 @@ declare module '$env/static/private' {
 	export const ALLUSERSPROFILE: string;
 	export const APPDATA: string;
 	export const CHROME_CRASHPAD_PIPE_NAME: string;
-	export const CLIENTNAME: string;
 	export const COLORTERM: string;
 	export const CommonProgramFiles: string;
 	export const CommonProgramW6432: string;
@@ -38,9 +37,7 @@ declare module '$env/static/private' {
 	export const configsetroot: string;
 	export const DOTNET_ROOT: string;
 	export const DriverData: string;
-	export const EFC_11748: string;
-	export const FPS_BROWSER_APP_PROFILE_STRING: string;
-	export const FPS_BROWSER_USER_PROFILE_STRING: string;
+	export const EFC_10784: string;
 	export const GIT_ASKPASS: string;
 	export const HOME: string;
 	export const HOMEDRIVE: string;
@@ -191,7 +188,6 @@ declare module '$env/dynamic/private' {
 		ALLUSERSPROFILE: string;
 		APPDATA: string;
 		CHROME_CRASHPAD_PIPE_NAME: string;
-		CLIENTNAME: string;
 		COLORTERM: string;
 		CommonProgramFiles: string;
 		CommonProgramW6432: string;
@@ -200,9 +196,7 @@ declare module '$env/dynamic/private' {
 		configsetroot: string;
 		DOTNET_ROOT: string;
 		DriverData: string;
-		EFC_11748: string;
-		FPS_BROWSER_APP_PROFILE_STRING: string;
-		FPS_BROWSER_USER_PROFILE_STRING: string;
+		EFC_10784: string;
 		GIT_ASKPASS: string;
 		HOME: string;
 		HOMEDRIVE: string;

@@ -19,10 +19,11 @@ export let wine: Wine = {
 export let index: number = 0;
 
 const dispatch = createEventDispatcher();
-
+//todo update to use wineflat
 let tempWines: Wine[] = [];
 $: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
 
+//todo update to use wineflat
 function handleWineUpdated() {
 	let storedValue = localStorage.getItem(producer) ?? '[]';
 	try {
@@ -39,6 +40,7 @@ function handleWineUpdated() {
 	tempWines = [];
 	dispatch('wineUpdated');
 }
+//todo update to use wineflat
 function qtyIncrement() {
 	console.log(`ZY Wine qtyIncrement - producer: ${producer} - wine:`);
 	console.log(wine);
@@ -78,7 +80,7 @@ function qtyIncrement() {
 	tempWines = [];
 	dispatch('wineUpdated');
 }
-
+//todo update to use wineflat
 function qtyDecrement() {
 	console.log(`ZY Wine qtyDecrement - producer: ${producer} - wine:`);
 	console.log(wine);
@@ -123,10 +125,7 @@ function qtyDecrement() {
 	}
 }
 
-function doSomething() {
-	console.log('doSomething called');
-}
-
+//todo update to use wineflat
 function deleteWine() {
 	console.log(`ZY Wine deleteWine - wine: ${wine}`);
 	console.log(`ZY Wine deleteWine - wine.Qty: ${wine.Qty}`);
@@ -160,24 +159,19 @@ function deleteWine() {
 		dispatch('wineUpdated');
 	}
 }
-
 </script>
-
-
+<!-- todo update for wineflat-->
 <Card.Root class="w-[200px] justify-center">
-	<Card.Header class="p-0">
-		<Card.Title></Card.Title>
-		<Card.Description></Card.Description>
-	</Card.Header>
-	<Card.Content>
+	<Card.Content class="p-3">
 		<div class="flex flex-col">
 			<div class="flex flex-auto justify-between">
 				<p class="mb-4 text-base">
 					Vintage: {wine.Vintage ? `${wine.Vintage} ` : ""}
 					<br />Bin: {wine.Bin ? `${wine.Bin} ` : ""}
+					{#if wine.Purchased}<br />Purchase Date: {wine.Purchased ? `${wine.Purchased} ` : ""}{/if}
 				</p>
 				<button
-					class="variant-soft chip justify-around hover:variant-filled"
+					class="variant-soft chip justify-around self-start hover:variant-filled"
 					on:click={deleteWine}
 				>
 					<span>❌</span>
@@ -198,5 +192,4 @@ function deleteWine() {
 			</div>
 		</div>
 	</Card.Content>
-	<Card.Footer class="p-0"></Card.Footer>
 </Card.Root>

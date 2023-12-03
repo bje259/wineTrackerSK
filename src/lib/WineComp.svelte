@@ -13,6 +13,7 @@ import type { Wine } from './types';
 
 const dispatch = createEventDispatcher();
 
+//todo update export to be wineflat
 export let producer: string;
 export let wine: Wine;
 export let index: number;
@@ -20,6 +21,7 @@ export let index: number;
 let tempWines: Wine[] = [];
 $: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
 
+//todo update to just pass along to parent
 function handleWineUpdated() {
 	let storedValue = localStorage.getItem(producer) ?? '[]';
 	try {
@@ -36,6 +38,7 @@ function handleWineUpdated() {
 	tempWines = [];
 	dispatch('wineUpdated');
 }
+//todo update to use wineflat
 function qtyIncrement() {
 	console.log(`ZZ Wine qtyIncrement - producer: ${producer} - wine:`);
 	console.log(wine);
@@ -75,7 +78,7 @@ function qtyIncrement() {
 	tempWines = [];
 	dispatch('wineUpdated');
 }
-
+//todo update to use wineflat
 function qtyDecrement() {
 	console.log(`ZZ Wine qtyDecrement - producer: ${producer} - wine:`);
 	console.log(wine);
@@ -119,7 +122,7 @@ function qtyDecrement() {
 		console.log('Error wine cannot go below 0');
 	}
 }
-
+//todo update to use wineflat
 function deleteWine() {
 	console.log(`ZZ Wine deleteWine - wine: ${wine}`);
 	console.log(`ZZ Wine deleteWine - wine.Qty: ${wine.Qty}`);
@@ -154,7 +157,7 @@ function deleteWine() {
 	}
 }
 </script>
-
+<!-- todo use each loop to create inventory management cards-->
 <div class="mb-8 flex flex-col">
 	<h3 class="left-0 mb-2 text-lg font-medium text-amber-600">
 		Name: {wine["Wine Name"]}<br />Vineyard Location: {wine["Vineyard Location"]}<br />Variety: {wine.Variety

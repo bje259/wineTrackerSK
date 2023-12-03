@@ -10,7 +10,7 @@ import type { Writable } from 'svelte/store';
 import '../app.pcss';
 import './styles.css';
 //import type {EventTarget} from 'svelte';
-
+//todo update to use wineflat
 //declarations
 let openNewWine = false;
 let openVerb = 'Open';
@@ -53,6 +53,7 @@ function isIterable(obj) {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
 
+// todo this shouldn't need to happen twice skip myWinceCellar.updateCellar
 // Load owned aspects from local storage on component mount
 onMount(() => {
 	if (!debugMode) {
@@ -67,6 +68,7 @@ onMount(() => {
 	}
 });
 
+//todo with wineflat update, this may not be needed, just delete individual wines
 /**
  * Delete all wines from a producer
  * @param producer The producer to delete
@@ -100,7 +102,7 @@ function handleWinesUpdated() {
 		updateDDLs();
 	}
 }
-
+//todo make sure works with wineflat does this need to exist in layout and page?
 function updateDDLs() {
 	console.log('updateDDLs called  - reseting searchParams');
 	searchParams = {
@@ -118,7 +120,7 @@ function updateDDLs() {
 		console.log(searchParams);
 	}
 }
-
+//todo determine if needed on layout and page, this doesn't match the one in layout
 function addOptions(paramKey: string, newOptions: { name: string; value: string }[]) {
 	if (searchParams[paramKey]) {
 		searchParams[paramKey] = [...searchParams[paramKey], ...newOptions];
@@ -127,6 +129,7 @@ function addOptions(paramKey: string, newOptions: { name: string; value: string 
 		searchParams[paramKey] = newOptions;
 	}
 }
+//todo does this need to exist here?
 function loadOwnedWinesFromLocalStorage(): Cellar {
 	const loadedOwnedWines: Cellar = {};
 
@@ -151,7 +154,8 @@ function loadOwnedWinesFromLocalStorage(): Cellar {
 }
 
 //reactive statements
-
+//todo turn back on when ready to do more than initial wines
+//todo update to use wineflat
 /*$: {
 	console.log('Reactive cellar in App.svelte updating from store');
 	cellar = $myWineCellar.getFilteredCellar({
@@ -213,6 +217,8 @@ $: updateDDLs();
 			/>
 			<AddSpecificWine producer={"_New Producer"} on:wineUpdated={handleWinesUpdated} />
 		</div>
+		<!--todo update for wineflat-->
+		<!--todo incorporate toggle for different sorts-->
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 			{#if Object.keys(cellar).length > 0}
 				{#each Object.keys(cellar) as producer (producer)}

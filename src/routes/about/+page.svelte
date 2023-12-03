@@ -1,4 +1,5 @@
 <script lang="ts">
+import InventoryMgmt from '$lib/InventoryMgmt.svelte';
 import * as Card from '$lib/components/ui/card';
 import { myWineCellar } from '$lib/store';
 import type { Wine } from '$lib/types';
@@ -13,7 +14,6 @@ export let wine: Wine = {
 	Vintage: 2015,
 	Bin: 'A1',
 	Qty: 10,
-	Purchased: '2020-01-01',
 	Notes: 'Excellent vintage'
 };
 export let index: number = 0;
@@ -168,19 +168,16 @@ function deleteWine() {
 </svelte:head>
 
 <Card.Root class="w-[200px] justify-center">
-	<Card.Header class="p-0">
-		<Card.Title></Card.Title>
-		<Card.Description></Card.Description>
-	</Card.Header>
-	<Card.Content>
+	<Card.Content class="p-3">
 		<div class="flex flex-col">
 			<div class="flex flex-auto justify-between">
 				<p class="mb-4 text-base">
 					Vintage: {wine.Vintage ? `${wine.Vintage} ` : ""}
 					<br />Bin: {wine.Bin ? `${wine.Bin} ` : ""}
+					{#if wine.Purchased}<br />Purchase Date: {wine.Purchased ? `${wine.Purchased} ` : ""}{/if}
 				</p>
 				<button
-					class="variant-soft chip justify-around hover:variant-filled"
+					class="variant-soft chip justify-around self-start hover:variant-filled"
 					on:click={deleteWine}
 				>
 					<span>❌</span>
@@ -201,5 +198,38 @@ function deleteWine() {
 			</div>
 		</div>
 	</Card.Content>
-	<Card.Footer class="p-0"></Card.Footer>
 </Card.Root>
+
+<div class="card w-[200px]">
+	<section class="p-3">
+		<div class="flex flex-col">
+			<div class="flex flex-auto justify-between">
+				<p class="mb-4 text-base">
+					Vintage: {wine.Vintage ? `${wine.Vintage} ` : ""}
+					<br />Bin: {wine.Bin ? `${wine.Bin} ` : ""}
+					{#if wine.Purchased}<br />Purchase Date: {wine.Purchased ? `${wine.Purchased} ` : ""}{/if}
+				</p>
+				<button
+					class="variant-soft chip justify-around self-start hover:variant-filled"
+					on:click={deleteWine}
+				>
+					<span>❌</span>
+				</button>
+			</div>
+
+			<Label
+				for="counter-input-example"
+				class="flex-shrink-1 bottom-0 col-span-2 mb-1 block content-end self-start text-sm font-medium text-gray-900 dark:text-white"
+				>Choose quantity:</Label
+			>
+			<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
+				<div class="variant-filled bg-secondary-400-500-token btn-group dark:divide-gray-700">
+					<button class="w-12" on:click={qtyDecrement}>-</button>
+					<Label class="w-12 p-2 text-center dark:text-black">{wine.Qty}</Label>
+					<button class="w-12" on:click={qtyIncrement}>+</button>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+<InventoryMgmt wine={wine} producer={producer} index={index} on:wineUpdated={handleWineUpdated} />

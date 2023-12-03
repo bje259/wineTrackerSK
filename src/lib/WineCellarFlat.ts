@@ -10,10 +10,6 @@ function isIterable(obj): boolean {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
 
-//todo
-//TODO
-//@todo
-// @TODO
 /**
  * The WineCellar class represents a collection of wines.
  * @property {Cellar} cellar - The cellar object.

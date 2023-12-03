@@ -1,0 +1,670 @@
+{
+	"B.R. Cohn": [
+		{
+			"Wine Name": "Cabernet Sauvignon",
+			"Vineyard Location": "North Coast",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2013,
+			"Bin": "8-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Barons De Rothschild (Lafite)": [
+		{
+			"Wine Name": "Saint Emilion Reserve Speciale",
+			"Vineyard Location": "Saint Emilion",
+			"Variety": "Red Blend",
+			"Vintage": 2012,
+			"Bin": "5-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Becker Vineyards": [
+		{
+			"Wine Name": "Barbera ",
+			"Vineyard Location": "Texas Hill Country",
+			"Variety": "Barbera",
+			"Vintage": 2020,
+			"Bin": "12-2",
+			"Qty": 1,
+			"Purchased": "10/24/2023",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Barbera - Merlot",
+			"Vineyard Location": "Texas  ",
+			"Variety": "Red Blend",
+			"Vintage": 2012,
+			"Bin": "15-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Franc Reserve",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Franc",
+			"Vintage": 2019,
+			"Bin": "15-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon",
+			"Vineyard Location": "Texas",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2015,
+			"Bin": "13-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Canada Family Vineyards",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2016,
+			"Bin": "12-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Canada Family Vineyards",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2017,
+			"Bin": "13-2",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Canada Family Vineyards",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2018,
+			"Bin": "12-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Wilmeth Vineyard",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2012,
+			"Bin": "12-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Wilmeth Vineyard",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2014,
+			"Bin": "14-2",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Wilmeth Vineyard",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2015,
+			"Bin": "14-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Cabernet Sauvignon Reserve - Wilmeth Vineyard",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2017,
+			"Bin": "14-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Carignan - Reddy Vineyard",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Carignan",
+			"Vintage": 2017,
+			"Bin": "13-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Claret",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2018,
+			"Bin": "15-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Counoise",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Counoise",
+			"Vintage": 2018,
+			"Bin": "3-1",
+			"Qty": 5,
+			"Purchased": "10/24/2023",
+			"Notes": "top 3 purchased oct24"
+		},
+		{
+			"Wine Name": "Culinaria",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2019,
+			"Bin": "11-3",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Dolcetto Reserve",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Dolcetto",
+			"Vintage": 2019,
+			"Bin": "7-2",
+			"Qty": 1,
+			"Purchased": "10/24/2023",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Dolcetto Reserve Wilmeth Vineyard",
+			"Vineyard Location": "Texas High Plains",
+			"Variety": "Dolcetto",
+			"Vintage": 2018,
+			"Bin": "7-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Grenache Talient Vineyard",
+			"Vineyard Location": "Texas Hill Country",
+			"Variety": "Grenache",
+			"Vintage": 2016,
+			"Bin": "11-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "GSM",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2018,
+			"Bin": "3-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": "HLSR 2023"
+		},
+		{
+			"Wine Name": "Inverno",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2018,
+			"Bin": "8-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Main Street Reserve Cabernet Sauvignon",
+			"Vineyard Location": "Texas",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2015,
+			"Bin": "11-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Malbec Reserve Talient Vineyard",
+			"Vineyard Location": "Texas Hill Country",
+			"Variety": "Malbec",
+			"Vintage": 2019,
+			"Bin": "14-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Malbec Reserve Talient Vineyard",
+			"Vineyard Location": "Texas Hill Country",
+			"Variety": "Malbec",
+			"Vintage": 2020,
+			"Bin": "14-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Petite Sirah",
+			"Vineyard Location": "Texas Hill Country",
+			"Variety": "Petite Sirah",
+			"Vintage": 2020,
+			"Bin": "8-2",
+			"Qty": 1,
+			"Purchased": "10/24/2023",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Primavera",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2018,
+			"Bin": "13-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Ranger Hays",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2017,
+			"Bin": "6-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Ranger Hays",
+			"Vineyard Location": "Texas",
+			"Variety": "Red Blend",
+			"Vintage": 2018,
+			"Bin": "14-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Reserve Merlot",
+			"Vineyard Location": "Texas",
+			"Variety": "Merlot",
+			"Vintage": 2016,
+			"Bin": "12-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Tempranilo Reserve",
+			"Vineyard Location": "Texas",
+			"Variety": "Tempranillo",
+			"Vintage": 2019,
+			"Bin": "12-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Tempranilo Reserve",
+			"Vineyard Location": "Texas",
+			"Variety": "Tempranillo",
+			"Vintage": 2020,
+			"Bin": "12-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Vintage Port",
+			"Vineyard Location": "Texas",
+			"Variety": "Port",
+			"Vintage": 2012,
+			"Bin": "15-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Catena Family Vineyards": [
+		{
+			"Wine Name": "Catena Malbec",
+			"Vineyard Location": "Argentina",
+			"Variety": "Malbec",
+			"Vintage": 2019,
+			"Bin": "7-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": "HLSR 2023"
+		}
+	],
+	"Chateau de Lescours": [
+		{
+			"Wine Name": "Saint Emilion Grand Cru",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2010,
+			"Bin": "5-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Saint Emilion Grand Cru",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2012,
+			"Bin": "5-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Ferran": [
+		{
+			"Wine Name": "Bordeaux  ",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2016,
+			"Bin": "7-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Grand-Puy-Lacoste": [
+		{
+			"Wine Name": "Pauillac",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2014,
+			"Bin": "5-1",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau La Confession": [
+		{
+			"Wine Name": "St-Emilion Grand Cru",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2015,
+			"Bin": "4-2",
+			"Qty": 4,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau La Croix St Georges": [
+		{
+			"Wine Name": "Pomerol Bordeaux",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2015,
+			"Bin": "6-2",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Larose-Trintaudon": [
+		{
+			"Wine Name": "Haut-Medoc Bordeaux",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 1995,
+			"Bin": "11-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau LaTour de Bessan": [
+		{
+			"Wine Name": "Margaux  ",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2016,
+			"Bin": "7-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Petit-Freylon": [
+		{
+			"Wine Name": "Bordeaux Superieur Cuvee Sarah",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2011,
+			"Bin": "6-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Pontac-Lynch": [
+		{
+			"Wine Name": "Margaux Cru Bourgeois",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2012,
+			"Bin": "7-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		},
+		{
+			"Wine Name": "Margaux Cru Bourgeois",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2015,
+			"Bin": "7-1",
+			"Qty": 3,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Saint Jean": [
+		{
+			"Wine Name": "Plan de Dieu Cotes du Rhone Villages",
+			"Vineyard Location": "Rhone",
+			"Variety": "Red Blend",
+			"Vintage": 2013,
+			"Bin": "6-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Chateau Tanunda": [
+		{
+			"Wine Name": "Grand Barossa Cabernet Sauvignon",
+			"Vineyard Location": "Australia",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2019,
+			"Bin": "5-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": "HLSR 2023"
+		}
+	],
+	"Cos D'Estournel": [
+		{
+			"Wine Name": "Saint-Estephe",
+			"Vineyard Location": "Bordeaux",
+			"Variety": "Red Blend",
+			"Vintage": 2014,
+			"Bin": "5-1",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Crock & Starr": [
+		{
+			"Wine Name": "Cabernet Franc ",
+			"Vineyard Location": "Napa Valley",
+			"Variety": "Red Blend",
+			"Vintage": 2018,
+			"Bin": "13-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Deicas": [
+		{
+			"Wine Name": "Tannat",
+			"Vineyard Location": "Uruguay",
+			"Variety": "Tannat",
+			"Vintage": 2015,
+			"Bin": "11-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Domaine Saint Prefert": [
+		{
+			"Wine Name": "Reserve Auguste Favier Chateauneuf du Pape",
+			"Vineyard Location": "Rhone",
+			"Variety": "Red Blend",
+			"Vintage": 2012,
+			"Bin": "6-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Frank Family Vineyards": [
+		{
+			"Wine Name": "Napa Valley Cabernet Sauvignon",
+			"Vineyard Location": "Napa Valley",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2018,
+			"Bin": "12-1",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": "HLSR 2023"
+		}
+	],
+	"Frescobaldi": [
+		{
+			"Wine Name": "Castiglioni Chianti ",
+			"Vineyard Location": "Italy",
+			"Variety": "Red Blend",
+			"Vintage": 2019,
+			"Bin": "11-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Homewood Winery": [
+		{
+			"Wine Name": "El Dorado Petite Sirah",
+			"Vineyard Location": "Sonoma",
+			"Variety": "Petite Sirah",
+			"Vintage": 2012,
+			"Bin": "5-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Irwin Family": [
+		{
+			"Wine Name": "Tempranillo Piedra Rojo Block 22",
+			"Vineyard Location": "California",
+			"Variety": "Tempranillo",
+			"Vintage": 2013,
+			"Bin": "15-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Mauritson": [
+		{
+			"Wine Name": "Zinfandel Dry Creek Valley",
+			"Vineyard Location": "Sonoma",
+			"Variety": "Zinfandel",
+			"Vintage": 2014,
+			"Bin": "13-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Michael David Vineyards": [
+		{
+			"Wine Name": "Earthquake Cabernet Sauvignon",
+			"Vineyard Location": "Lodi",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2013,
+			"Bin": "8-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Nice Winery": [
+		{
+			"Wine Name": "Malbec  ",
+			"Vineyard Location": "Argentina",
+			"Variety": "Malbec",
+			"Vintage": 2019,
+			"Bin": "6-3",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Renieri": [
+		{
+			"Wine Name": "Brunello di Montalcino",
+			"Vineyard Location": "Italy",
+			"Variety": "Red Blend",
+			"Vintage": 2013,
+			"Bin": "6-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"Sciandri": [
+		{
+			"Wine Name": "Nello Coombsville",
+			"Vineyard Location": "Napa Valley",
+			"Variety": "Red Blend",
+			"Vintage": 2016,
+			"Bin": "14-2",
+			"Qty": 1,
+			"Purchased": "",
+			"Notes": ""
+		}
+	],
+	"St Francis": [
+		{
+			"Wine Name": "Cabernet Sauvignon - Sonoma County",
+			"Vineyard Location": "Sonoma",
+			"Variety": "Cabernet Sauvignon",
+			"Vintage": 2011,
+			"Bin": "15-3",
+			"Qty": 2,
+			"Purchased": "",
+			"Notes": ""
+		}
+	]
+}

@@ -92,7 +92,7 @@ function chk(indices: number[], useOr = false) {
 		Purchased: "2020-01-01",
 		Notes: "Excellent vintage"
 	};*/
-
+//todo combine with newWineSubmit and wine flat
 function newProducerSubmit() {
 	console.log(`ZZ Wine newProducerSubmit - newProducer: ${newProducerName}`);
 	let storedValue = localStorage.getItem(newProducerName) ?? '[]';
@@ -113,7 +113,7 @@ function newProducerSubmit() {
 	openNewWine = true;
 	newProducerName = '';
 }
-
+//todo update to use wineflat and incorporate producer
 function newWineSubmit() {
 	console.log(`ZZ Wine newWineSubmit - producer: ${producer} - newWine:`);
 	console.log(newWine);
@@ -162,6 +162,7 @@ function newWineSubmit() {
 function clearText(setter: (value: string) => void): void {
 	setter('');
 }
+
 function resetNumber(setter: (value: number) => void): void {
 	setter(0);
 }
@@ -259,6 +260,7 @@ $: {
 // 		console.log(chk([-0, 1]));
 // 	}
 // }
+//todo update to use wineflat
 $: newWine = {
 	'Wine Name': newWineName,
 	'Vineyard Location': newVineyardLocation,
@@ -287,7 +289,7 @@ $: newWine = {
  * @param fOn[7] -
  */
 </script>
-
+<!--todo update to incorporate wineflat structure-->
 {#if rOn[1][1]}
 	<div class="flex flex-col items-center justify-center">
 		<form>
