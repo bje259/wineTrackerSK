@@ -3,7 +3,7 @@
  * @property {string} "Wine Name" - The name of the wine.
  * @property {string} "Vineyard Location" (Optional) - The producer of the wine.
  * @property {string} Variety - (Optional) The variety of the wine.
- * @property {number} Vintage - (Optional) The vintage of the wine.
+ * @property {number} Vintage - The vintage of the wine.
  * @property {string} Bin - (Optional) The bin where the wine is stored.
  * @property {number} Qty - The quantity of the wine.
  * @property {string} Purchased - (Optional) The date when the wine was purchased.
@@ -67,7 +67,22 @@ export interface Cellar {
 }
 
 export type CellarFlat = WineFlat[];
-
+/**
+ * WineFlat interface represents a flattened wine object
+ * @property {string} Producer - The name of the producer.
+ * @property {string} "Wine Name" - The name of the wine.
+ * @property {string} "Vineyard Location" (Optional) - The producer of the wine.
+ * @property {string} Variety - (Optional) The variety of the wine.
+ * @property {InvItem[]} Inventory - An array of InvItem objects.
+ * @property {string} Notes - (Optional) Any notes about the wine.
+ * Note InvItem has these properties:
+ * @see {number} Vintage -  The vintage of the wine.
+ * @see {string} Bin - The bin where the wine is stored.
+ * @see {number} Qty - The quantity of the wine.
+ * @see {string} Purchased - (Optional) The date when the wine was purchased.
+ * The WineFlat interface is used by the WineCellarFlat class.
+ * @see WineCellarFlatt
+ */
 export interface WineFlat {
 	Producer: string;
 	'Wine Name': string;
@@ -77,9 +92,59 @@ export interface WineFlat {
 	Notes?: string;
 }
 
+/**
+ * InvItem interface represents a wine inventory item.
+ * @property {number} Vintage - The vintage of the wine.
+ * @property {string} Bin - The bin where the wine is stored.
+ * @property {number} Qty - The quantity of the wine.
+ * @property {string} Purchased - (Optional) The date when the wine was purchased.
+ * The InvItem interface is used by the WineFlat interface.
+ * @see WineFlat
+ */
 export interface InvItem {
 	Vintage: number;
 	Bin: string;
 	Purchased?: string;
 	Qty: number;
+}
+
+/**
+ * SearchParam interface represents a search parameter.
+ * @property {boolean} isActive - Indicates if the search parameter is active.
+ * @property {string | number} value - The value of the search parameter.
+ * The SearchParam interface is used by the SearchParams interface.
+ * @see SearchParams
+ */
+export interface SearchParam {
+	isActive: boolean;
+	value: string | number;
+}
+
+
+/**
+ * SearchParams interface represents the search parameters.
+ * @property {SearchParam} Producer - The name of the producer.
+ * @property {SearchParam} "Wine Name" - The name of the wine.
+ * @property {SearchParam} "Vineyard Location" (Optional) - The producer of the wine.
+ * @property {SearchParam} Variety - (Optional) The variety of the wine.
+ * @property {SearchParam} Notes - (Optional) Any notes about the wine.
+ * @property {SearchParam} Vintage - The vintage of the wine.
+ * @property {SearchParam} Bin - (Optional) The bin where the wine is stored.
+ * @property {SearchParam} Purchased - (Optional) The date when the wine was purchased.
+ * @property {SearchParam} Qty - The quantity of the wine.
+ * @property {SearchParam} SearchTerm - The search term.
+ * The SearchParams interface is used by the WineCellar class.
+ * @see WineCellar
+ */
+export interface SearchParams {
+	Producer?: SearchParam;
+	'Wine Name'?: SearchParam;
+	'Vineyard Location'?: SearchParam;
+	Variety?: SearchParam;
+	Notes?: SearchParam;
+	Vintage?: SearchParam;
+	Bin?: SearchParam;
+	Purchased?: SearchParam;
+	Qty?: SearchParam;
+	SearchTerm?: SearchParam;
 }

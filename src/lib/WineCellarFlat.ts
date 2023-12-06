@@ -1,12 +1,14 @@
-import type { Cellar, Wine, CellarFlat, WineFlat } from './types';
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { WineCellar } from './WineCellar';
+import type { Cellar, CellarFlat, InvItem, SearchParams, Wine, WineFlat } from './types';
 
 /**
  * @description Checks if an object is iterable.
- * @param obj 
+ * @param obj
  * @returns boolean
  */
-function isIterable(obj): boolean {
+function isIterable(obj: any): boolean {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
 
@@ -17,11 +19,11 @@ function isIterable(obj): boolean {
  * @see Cellar
  * @see WineCellar
  * @example
- * @todo convert to store data in new flat datatypes
  */
-export class WineCellar {
-	cellar: Cellar;
+export class WineCellarFlat extends WineCellar {
 	cellarFlat: CellarFlat;
+	filteredCellarFlat: CellarFlat;
+	currentSearchParams: SearchParams;
 
 	/**
 	 * The WineCellar class represents a collection of wines.
@@ -42,10 +44,174 @@ export class WineCellar {
 	 * });
 	 */
 	constructor(cell?: Cellar, cellFlat?: CellarFlat) {
-		if (cellFlat) this.cellarFlat = cellFlat;
-		else this.cellarFlat = [];
-		if (cell) this.cellar = cell;
-		else this.cellar = {};
+		super(cell ? cell : cellFlat ? WineCellarFlat.convertToCellar(cellFlat) : {});
+		this.cellarFlat = cellFlat ? cellFlat : cell ? WineCellarFlat.convertToFlat(cell) : [];
+		this.filteredCellarFlat = this.cellarFlat;
+		this.currentSearchParams = {
+			Producer: { isActive: false, value: '' },
+			['Vineyard Location']: { isActive: false, value: '' },
+			Variety: { isActive: false, value: '' },
+			SearchTerm: { isActive: false, value: '' }
+		};
+
+	}
+
+
+	/**
+	 * Convert cellar to cellarFlat
+	 */
+	public static convertToFlat(cellar: Cellar): CellarFlat {
+		let cellarFlat: CellarFlat = [];
+		for (const producer in cellar) {
+			for (const wine of cellar[producer]) {
+				if (
+					!this.chkFlatByPrdNmVyVar(
+						cellarFlat,
+						producer,
+						wine['Wine Name'],
+						wine['Vineyard Location'] ? wine['Vineyard Location'] : null,
+						wine.Variety ? wine.Variety : null
+					)
+				) {
+					let newWineFlatItem: WineFlat = {
+						Producer: producer,
+						'Wine Name': wine['Wine Name'],
+						'Vineyard Location': wine['Vineyard Location'],
+						Variety: wine.Variety,
+						Inventory: [
+							{
+								Vintage: wine.Vintage,
+								Bin: wine.Bin ? wine.Bin : '',
+								Qty: wine.Qty,
+								Purchased: wine.Purchased
+							}
+						],
+						Notes: wine.Notes
+					};
+					cellarFlat.push(newWineFlatItem);
+				} else {
+					let existingWineFlatItem: WineFlat | undefined = cellarFlat.find(
+						(w) =>
+							w.Producer === producer &&
+							w['Wine Name'] === wine['Wine Name'] &&
+							w['Vineyard Location'] === wine['Vineyard Location'] &&
+							w.Variety === wine.Variety
+					);
+					if (existingWineFlatItem) {
+						let newInvItem: InvItem = {
+							Vintage: wine.Vintage,
+							Bin: wine.Bin ? wine.Bin : '',
+							Qty: wine.Qty,
+							Purchased: wine.Purchased
+						};
+						existingWineFlatItem.Inventory.push(newInvItem);
+					}
+				}
+			}
+		}
+		return cellarFlat;
+	}
+
+	/**
+	 * Convert cellarFlat to cellar
+	 */
+	public static convertToCellar(cellarFlat: CellarFlat): Cellar {
+		let cellar: Cellar = {};
+		for (const wine of cellarFlat) {
+			if (!cellar[wine.Producer]) {
+				cellar[wine.Producer] = [];
+			}
+			for (const invItem of wine.Inventory) {
+				let newWine: Wine = {
+					'Wine Name': wine['Wine Name'],
+					'Vineyard Location': wine['Vineyard Location'],
+					Variety: wine.Variety,
+					Vintage: invItem.Vintage,
+					Bin: invItem.Bin,
+					Qty: invItem.Qty,
+					Purchased: invItem.Purchased,
+					Notes: wine.Notes
+				};
+				cellar[wine.Producer].push(newWine);
+			}
+		}
+		return cellar;
+	}
+
+	public static convertWineToFlat(producer: string, wine: Wine): WineFlat {
+		let wineFlat: WineFlat = {
+			Producer: producer,
+			'Wine Name': wine['Wine Name'],
+			'Vineyard Location': wine['Vineyard Location'],
+			Variety: wine.Variety,
+			Inventory: [
+				{
+					Vintage: wine.Vintage,
+					Bin: wine.Bin ? wine.Bin : '',
+					Qty: wine.Qty,
+					Purchased: wine.Purchased
+				}
+			],
+			Notes: wine.Notes
+		};
+		return wineFlat;
+	}
+
+	/* public static convertWinesToFlats(producer: string, wines: Wine[]): WineFlat[] {
+		let wineFlats: WineFlat[] = [];
+		for (let i = 0; i < wines.length; i++) {
+			let wineFlat: WineFlat = {
+				Producer: producer,
+				'Wine Name': wines[i]['Wine Name'],
+				'Vineyard Location': wines[i]['Vineyard Location'],
+				Variety: wines[i].Variety,
+				Inventory: [
+					{
+						Vintage: wines[i].Vintage,
+						Bin: wines[i].Bin,
+						Qty: wines[i].Qty,
+						Purchased: wines[i].Purchased
+					}
+				],
+				Notes: wines[i].Notes
+			};
+			wineFlats.push(wineFlat);
+		}
+		return wineFlats;
+	} */
+
+	public static convertWineFlatToWine(wineFlat: WineFlat): Wine {
+		let wine: Wine = {
+			['Wine Name']: wineFlat['Wine Name'],
+			['Vineyard Location']: wineFlat['Vineyard Location'],
+			Variety: wineFlat.Variety,
+			Vintage: wineFlat.Inventory[0].Vintage,
+			Bin: wineFlat.Inventory[0].Bin,
+			Qty: wineFlat.Inventory[0].Qty,
+			Purchased: wineFlat.Inventory[0].Purchased,
+			Notes: wineFlat.Notes
+		};
+		return wine;
+	}
+
+	public static convertWineInvToProdAndWineArray(
+		wineInv: WineFlat
+	): [producer: string, wine: Wine[]] {
+		let wineArray: Wine[] = [];
+		for (const invItem of wineInv.Inventory) {
+			let wine: Wine = {
+				'Wine Name': wineInv['Wine Name'],
+				'Vineyard Location': wineInv['Vineyard Location'],
+				Variety: wineInv.Variety,
+				Vintage: invItem.Vintage,
+				Bin: invItem.Bin,
+				Qty: invItem.Qty,
+				Purchased: invItem.Purchased,
+				Notes: wineInv.Notes
+			};
+			wineArray.push(wine);
+		}
+		return [wineInv.Producer, wineArray];
 	}
 
 	/**
@@ -83,32 +249,94 @@ export class WineCellar {
 	 * // 	}
 	 * // ]
 	 */
-	addWine(producer: string, wine: Wine): void {
-		const existingWine: Wine[] = this.cellar[producer] || [];
-		this.cellar[producer] = [...existingWine, wine];
+
+	addWine(producer: string, wine: Wine): void;
+	addWine(wineFlat: WineFlat): void;
+	addWine(arg1: string | WineFlat, arg2?: Wine): void {
+		if (typeof arg1 === 'string') {
+			const producer = arg1;
+			const existingCellarFlat: CellarFlat = this.cellarFlat || [];
+			if (
+				arg2 &&
+				WineCellarFlat.chkFlatByPrdNmVyVar(
+					existingCellarFlat,
+					producer,
+					arg2['Wine Name'],
+					arg2['Vineyard Location'],
+					arg2.Variety
+				)
+			) {
+				const existingWineFlat = existingCellarFlat.find(
+					(w) =>
+						w.Producer === producer &&
+						w['Wine Name'] === arg2['Wine Name'] &&
+						w['Vineyard Location'] === arg2['Vineyard Location'] &&
+						w.Variety === arg2.Variety
+				);
+				if (existingWineFlat)
+					existingCellarFlat[existingCellarFlat.indexOf(existingWineFlat)].Inventory.push({
+						Vintage: arg2.Vintage,
+						Bin: arg2.Bin ? arg2.Bin : '',
+						Qty: arg2.Qty,
+						Purchased: arg2.Purchased
+					});
+				this.cellarFlat = existingCellarFlat;
+			} else {
+				if (arg2)
+					existingCellarFlat.push({
+						Producer: producer,
+						'Wine Name': arg2['Wine Name'],
+						'Vineyard Location': arg2['Vineyard Location'],
+						Variety: arg2.Variety,
+						Inventory: [
+							{
+								Vintage: arg2.Vintage,
+								Bin: arg2.Bin ? arg2.Bin : '',
+								Qty: arg2.Qty,
+								Purchased: arg2.Purchased
+							}
+						],
+						Notes: arg2.Notes
+					});
+				this.cellarFlat = existingCellarFlat;
+			}
+		} else {
+			const wineFlat = arg1;
+			const existingCellarFlat: CellarFlat = this.cellarFlat || [];
+			if (
+				WineCellarFlat.chkFlatByPrdNmVyVar(
+					existingCellarFlat,
+					wineFlat.Producer,
+					wineFlat['Wine Name'],
+					wineFlat['Vineyard Location'],
+					wineFlat.Variety
+				)
+			) {
+				const existingWineFlat = existingCellarFlat.find(
+					(w) =>
+						w.Producer === wineFlat.Producer &&
+						w['Wine Name'] === wineFlat['Wine Name'] &&
+						w['Vineyard Location'] === wineFlat['Vineyard Location'] &&
+						w.Variety === wineFlat.Variety
+				);
+				for (const invItem of wineFlat.Inventory)
+					if (existingWineFlat)
+						existingCellarFlat[existingCellarFlat.indexOf(existingWineFlat)].Inventory.push({
+							Vintage: invItem.Vintage,
+							Bin: invItem.Bin,
+							Qty: invItem.Qty,
+							Purchased: invItem.Purchased
+						});
+				this.cellarFlat = existingCellarFlat;
+			} else {
+				existingCellarFlat.push(wineFlat);
+				this.cellarFlat = existingCellarFlat;
+			}
+		}
+		//todo decide if I want to keep cellar in sync with cellarFlat
+		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
 	}
 
-	/**
-	 * Adds a flatwine to cellar.  Check if a match exists, if so, return error to have user just update inventory
-	 *@todo
-	 */
-	addWineFlat(wineFlat: WineFlat): void {
-		const existingWine: WineFlat[] = this.cellarFlat || [];
-		this.cellarFlat = [...existingWine, wineFlat];
-	}
-
-	/**
-	 * Adds a producer to the wine cellar.
-	 * @param producer - The producer of the wine.
-	 * @returns Nothing.
-	 * @see Wine
-	 * @see Cellar
-	 * @see WineCellar
-	 */
-	addProducer(producer: string): void {
-		this.cellar[producer] = [];
-	}
-//todo add flatwine version
 	/**
 	 * Removes a wine from the wine cellar.
 	 * @param producer - The producer of the wine.
@@ -117,42 +345,48 @@ export class WineCellar {
 	 * @returns True if the wine was successfully removed, false otherwise.
 	 */
 	removeWine(producer: string, wineName: string, wine?: Wine): boolean {
-		if (this.cellar[producer]) {
-			if (wine) {
-				const index = this.cellar[producer].indexOf(wine);
-				if (index !== -1) {
-					let tmp = this.cellar[producer];
-					tmp.splice(index, 1);
-					this.cellar[producer] = tmp;
-					return true; // Wine removed successfully
-				}
-			} else {
-				const index = this.cellar[producer].findIndex((wine) => wine['Wine Name'] === wineName);
-				if (index !== -1) {
-					let tmp = this.cellar[producer];
-					tmp.splice(index, 1);
-					this.cellar[producer] = tmp;
-				}
+		if (this.cellarFlat) {
+			const currentCellarFlat = this.cellarFlat;
+			const index = this.cellarFlat.findIndex(
+				(w) =>
+					w.Producer === producer &&
+					w['Wine Name'] === wineName &&
+					wine?.Variety &&
+					w['Vineyard Location'] === wine['Vineyard Location'] &&
+					w.Variety === wine.Variety
+			);
+
+			if (index !== -1) {
+				currentCellarFlat.splice(index, 1);
+				this.cellarFlat = currentCellarFlat;
+				this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
+				return true;
 			}
 		}
-		return false; // Wine not found
+		return false;
 	}
 
 	/**
 	 * Remove a producer from a wine cellar.
+	 * @param producer - The producer of the wine.
+	 * @returns True if the producer was successfully removed, false otherwise.
+	 * @see WineFlat
+	 * @see CellarFlat
 	 */
 	removeProducer(producer: string): boolean {
-		let tempCellar: Cellar = {};
-		if (!this.cellar[producer]) return false;
-		Object.keys(this.cellar).forEach((key) => {
-			if (key !== producer) {
-				tempCellar[key] = this.cellar[key];
+		let tempCellarFlat: CellarFlat = [];
+		let foundProducer = false;
+		for (const wine of this.cellarFlat) {
+			if (wine.Producer !== producer) {
+				tempCellarFlat.push(wine);
+			} else {
+				foundProducer = true;
 			}
-		});
-		this.cellar = tempCellar;
-		return true;
+		}
+		this.cellarFlat = tempCellarFlat;
+		return foundProducer;
 	}
-//todo add flatwine version
+
 	/**
 	 * Updates a wine given the producer and wine object.
 	 * @param producer - The producer of the wine.
@@ -193,37 +427,42 @@ export class WineCellar {
 	 * // ]
 	 */
 	updateWine(producer: string, wine: Wine, i: number = -1): boolean {
-		if (this.cellar[producer]) {
+		if (this.cellarFlat) {
+			const wineFlat = WineCellarFlat.convertWineToFlat(producer, wine);
+			const currentCellarFlat = this.cellarFlat;
 			if (i === -1) {
-				const index = this.cellar[producer].findIndex((w) => w['Wine Name'] === wine['Wine Name']);
+				const index = this.cellarFlat.findIndex(
+					(w) =>
+						w.Producer === producer &&
+						w['Wine Name'] === wine['Wine Name'] &&
+						w['Vineyard Location'] === wine['Vineyard Location'] &&
+						w.Variety === wine.Variety
+				);
 				if (index !== -1) {
-					let tmp = this.cellar[producer];
-					tmp[index] = wine;
-					this.cellar[producer] = tmp;
-					return true; // Wine updated successfully
+					currentCellarFlat[index] = wineFlat;
+					this.cellarFlat = currentCellarFlat;
+					return true;
 				}
 			} else {
-				let tmp = this.cellar[producer];
-				tmp[i] = wine;
-				this.cellar[producer] = tmp;
-				return true; // Wine updated successfully
+				currentCellarFlat[i] = wineFlat;
+				this.cellarFlat = currentCellarFlat;
+				return true;
 			}
-			console.log('producer found but wine not found');
 		}
-		return false; // Wine not found
+		return false;
 	}
-
-	//todo add flatwine version
+	//use filter function for flatwine version
 	/**
 	 * Retrieves an array of wines by the specified producer.
 	 * @param producer - The name of the producer.
 	 * @returns An array of wines produced by the specified producer, or undefined if no wines are found.
 	 */
 	getWinesByProducer(producer: string): Wine[] | undefined {
+		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
 		return this.cellar[producer];
 	}
 
-	//todo add flatwine version
+	//use filter function for flatwine version
 	/**
 	 * Retrive any matching wines by the specified producer and wine name.
 	 * @param producer - The name of the producer.
@@ -271,10 +510,14 @@ export class WineCellar {
 	 * @returns The cellar object.
 	 */
 	getCellar(): Cellar {
+		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
 		return this.cellar;
 	}
 
-	//todo add flatwine version
+	getCellarFlat(): CellarFlat {
+		return this.cellarFlat;
+	}
+
 	/**
 	 * Retrieves a flat array of all producers and wines in the cellar.
 	 * @returns An array of wines produced by the specified producer, or undefined if no wines are found.
@@ -328,15 +571,24 @@ export class WineCellar {
 			Purchased?: string | undefined;
 			Notes?: string | undefined;
 		}[] = [];
-		for (const producer in this.cellar) {
-			for (const wine of this.cellar[producer]) {
-				wines.push({ producer, ...wine });
+		for (const wine of this.cellarFlat) {
+			for (const invItem of wine.Inventory) {
+				wines.push({
+					producer: wine.Producer,
+					'Wine Name': wine['Wine Name'],
+					'Vineyard Location': wine['Vineyard Location'],
+					Variety: wine.Variety,
+					Vintage: invItem.Vintage,
+					Bin: invItem.Bin,
+					Qty: invItem.Qty,
+					Purchased: invItem.Purchased,
+					Notes: wine.Notes
+				});
 			}
 		}
 		return wines;
 	}
 
-	//todo add flatwine version
 	/**
 	 * Retrieve producer names formatted as {name: "Producer Name", value: "Producer Name"}.
 	 * @returns An array of producer names.
@@ -362,31 +614,32 @@ export class WineCellar {
 	 * // ]
 	 */
 	getProducerNames(): { name: string; value: string }[] {
-		const producers = [];
-		if (!isIterable(producers)) return [];
-		for (const producer in this.cellar) {
-			producers.push({ name: producer, value: producer });
+		const producers: { name: string; value: string }[] = [];
+		const winesFlat = this.filteredCellarFlat;
+		//if (!isIterable(winesFlat)) return [];
+		for (const wines of this.filteredCellarFlat) {
+			producers.push({ name: wines.Producer, value: wines.Producer });
 		}
+		console.log(producers);
+		console.log('get producer names mid moethod:');
 		const uniqueProducers = producers.filter(
 			(v, i, a) => a.findIndex((t) => t.name === v.name) === i
 		);
+		console.log(uniqueProducers);
+		console.log('above are unqiue producers');
 		return uniqueProducers || [];
 	}
 
-	//todo add flatwine version
 	/**
 	 * Retrieve variety names formatted as {name: "variety", value: "variety"}.
 	 * @returns An array of variety names.
 	 */
 	getVarietyNames(): { name: string; value: string }[] {
-		const varieties = [];
-		for (const producer in this.cellar) {
-			if (!isIterable(this.cellar[producer])) continue;
-			for (const wine of this.cellar[producer]) {
-				if (wine.Variety) {
-					varieties.push({ name: wine.Variety, value: wine.Variety });
-				}
-			}
+		const varieties: { name: string; value: string }[] = [];
+		const winesFlat = this.filteredCellarFlat;
+		//if (!isIterable(winesFlat)) return [];
+		for (const wineFlat of winesFlat) {
+			if (wineFlat.Variety) varieties.push({ name: wineFlat.Variety, value: wineFlat.Variety });
 		}
 		const uniqueVarieties = varieties.filter(
 			(v, i, a) => a.findIndex((t) => t.name === v.name) === i
@@ -394,20 +647,20 @@ export class WineCellar {
 		return uniqueVarieties || [];
 	}
 
-	//todo add flatwine version
 	/**
 	 * Retrieve vineyard names formatted as {name: "vineyard", value: "vineyard"}.
 	 * @returns An array of vineyard names.
 	 */
 	getVineyardNames(): { name: string; value: string }[] {
-		const vineyards = [];
-		for (const producer in this.cellar) {
-			if (!isIterable(this.cellar[producer])) continue;
-			for (const wine of this.cellar[producer]) {
-				if (wine['Vineyard Location']) {
-					vineyards.push({ name: wine['Vineyard Location'], value: wine['Vineyard Location'] });
-				}
-			}
+		const vineyards: { name: string; value: string }[] = [];
+		const winesFlat = this.filteredCellarFlat;
+		//if (!isIterable(winesFlat)) return [];
+		for (const wineFlat of winesFlat) {
+			if (wineFlat['Vineyard Location'])
+				vineyards.push({
+					name: wineFlat['Vineyard Location'],
+					value: wineFlat['Vineyard Location']
+				});
 		}
 		const uniqueVineyards = vineyards.filter(
 			(v, i, a) => a.findIndex((t) => t.name === v.name) === i
@@ -415,7 +668,6 @@ export class WineCellar {
 		return uniqueVineyards || [];
 	}
 
-	//todo add flatwine version
 	/**
 	 * Retrieve a filtered cellar based on the provided filters (optional filters include searchterm, producer, variety, vineyard).
 	 * @param filters - An object containing optional filters.
@@ -487,7 +739,119 @@ export class WineCellar {
 		return filteredCellar;
 	}
 
-	//todo add flatwine version
+	/**
+	 * Update search parameters for the filtered cellar.
+	 *
+	 */
+	updateSearchParams(filters: {
+		searchterm?: string;
+		producer?: string;
+		variety?: string;
+		vineyard?: string;
+	}): void {
+		this.currentSearchParams = {
+			Producer: { isActive: false, value: '' },
+			['Vineyard Location']: { isActive: false, value: '' },
+			Variety: { isActive: false, value: '' },
+			SearchTerm: { isActive: false, value: '' }
+		};
+
+		
+		let invKeys: (keyof InvItem)[] = ['Vintage', 'Bin', 'Qty', 'Purchased'];
+		let searchToken = '';
+		let keys: (keyof SearchParams)[] = [];
+		for (const key in this.currentSearchParams) {
+		if (key === 'SearchTerm') {
+			continue;
+		}
+		keys.push(key as keyof SearchParams);
+		}
+			}
+			
+		
+	
+	
+
+
+	/**
+	 * Update filtered celler data based on current search parameters.
+	 * @param
+	 * @returns
+	 */
+
+	updateFilteredCellar(searchToken: string): void {
+		//cycle through the search params one at a time and updated the cellarFlat
+		//if the search term is empty, then skip that search param
+		//if the search term is not empty, then filter the cellarFlat based on that search param
+		//SearchTerm
+		let keys: (keyof WineFlat)[] = [
+			'Wine Name',
+			'Vineyard Location',
+			'Variety',
+			'Inventory',
+			'Notes',
+			'Producer'
+		];
+		let invKeys: (keyof InvItem)[] = ['Vintage', 'Bin', 'Qty', 'Purchased'];
+
+		let currentCellarFlat = this.cellarFlat;
+		if (this.currentSearchParams.SearchTerm?.isActive) {
+			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+				if (searchToken === 'Inventory') return true;
+				return keys.some((key) => {
+					if (key === 'Inventory') {
+						return true;
+					} else {
+						let searchTermValue = this.currentSearchParams.SearchTerm?.value;
+						if (typeof searchTermValue === 'string') {
+							return wineFlat[key]?.toLowerCase().includes(searchTermValue.toLowerCase());
+						}
+						return false;
+					}
+				});
+			});
+			//Inventory
+			if(currentCellarFlat&&(searchToken==='Inventory'||searchToken==='SearchTerm')){
+				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+					return wineFlat.Inventory.some((invItem) => {
+						return invKeys.some((key) => {
+							return invItem[key]?.toString().toLowerCase().includes(searchToken.toLowerCase());
+						});
+					});
+				});
+			}
+		}
+		//Producer
+		if (this.currentSearchParams.Producer ? this.currentSearchParams["Producer"] : true) {
+			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+				return wineFlat.Producer?.toLowerCase().includes(searchToken.toLowerCase());
+			});
+		}
+		//Variety
+		if (this.currentSearchParams.Variety ? this.currentSearchParams.Variety["isActive"] : true) {
+			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+				return wineFlat.Variety?.toLowerCase().includes(searchToken.toLowerCase());
+			});
+		}
+		//Vineyard Location
+		if (
+			this.currentSearchParams['Vineyard Location']
+				? this.currentSearchParams['Vineyard Location']["isActive"]
+				: true
+		) {
+			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+				return wineFlat['Vineyard Location']?.toLowerCase().includes(searchToken.toLowerCase());
+			});
+		}
+		this.filteredCellarFlat = currentCellarFlat;
+		console.log('filtered cellar flat: ');
+		console.log(this.filteredCellarFlat);
+	}
+
+	getFilteredCellarFlat(): WineFlat[] {
+		return this.filteredCellarFlat;
+	}
+
 	/**
 	 * Checks the wine cellar for a wine with the specified name and vintage.
 	 * @param wineName - The name of the wine to search for.
@@ -495,36 +859,60 @@ export class WineCellar {
 	 * @returns The wine object if found, otherwise undefined.
 	 */
 	checkWineByNameVintage(wineName: string, vintage: number): Wine | undefined {
-		for (const producer in this.cellar) {
-			const wine = this.cellar[producer].find(
-				(w) => w['Wine Name'] === wineName && w.Vintage === vintage
-			);
-			if (wine) return wine;
-		}
-		return undefined;
+		/*return WineCellarFlat.convertWineFlatToWine(
+			this.cellarFlat.find((wine) => {
+				return (
+					wine['Wine Name'] === wineName &&
+					wine.Inventory.some((invItem) => {
+						return invItem.Vintage === vintage;
+					})
+				);
+			})
+		);*/
+		//todo
+		let tempWine: any = {};
+		return tempWine;
 	}
 
-/**
- * todo Check wine by producer, name, vineyard and variety
- */
-
-
-
-	//todo add flatwine version
 	/**
-	 * Checks the wine cellar for a wine with the specified name.
-	 * @param wineName - The name of the wine to search for.
-	 * @returns The wine object if found, otherwise undefined.
+	 *  Checks the wine cellar for a wine with the specified name, producer, vineyard, and variety.
+	 * @param producer
+	 * @param wineName
+	 * @param vineyard
+	 * @param variety
+	 * @returns boolean
+	 * @see WineFlat
+	 * @see CellarFlat
+	 * @see Wine
 	 */
-	checkWineByName(wineName: string): Wine | undefined {
-		for (const producer in this.cellar) {
-			const wine = this.cellar[producer].find((w) => w['Wine Name'] === wineName);
-			if (wine) return wine;
+	public static chkFlatByPrdNmVyVar(
+		cellarFlat: CellarFlat,
+		producer: string,
+		wineName: string,
+		vineyard?: string | null,
+		variety?: string | null
+	): boolean {
+		const cellFlat = cellarFlat;
+		if (!cellFlat || cellFlat.length === 0) return false;
+		for (const wine of cellFlat) {
+			if (wine.Producer === producer && wine['Wine Name'] === wineName) {
+				const vineyardMatch =
+					vineyard === null
+						? wine['Vineyard Location'] === undefined
+						: wine['Vineyard Location'] === vineyard;
+				const varietyMatch =
+					variety === null ? wine.Variety === undefined : wine.Variety === variety;
+
+				if (vineyardMatch && varietyMatch) {
+					return true;
+				}
+			}
 		}
-		return undefined;
+		return false;
 	}
 
-	//todo add flatwine version	
+	
+
 	/**
 	 * Updates this.cellar for a specified producer with a wine array provided as a parameter.
 	 * @param producer - The name of the producer.
@@ -565,9 +953,9 @@ export class WineCellar {
 	 */
 	updateCellarByProducer(producer: string, wines: Wine[]): void {
 		this.cellar[producer] = wines;
+		this.cellarFlat = WineCellarFlat.convertToFlat(this.cellar);
 	}
 
-	//todo add flatwine version
 	/**
 	 * Updates this.cellar with a provided cellar object.
 	 * @param cellar - The cellar object.
@@ -607,34 +995,54 @@ export class WineCellar {
 	 */
 	updateCellar(cellar: Cellar): void {
 		this.cellar = cellar;
+		this.cellarFlat = WineCellarFlat.convertToFlat(this.cellar);
 		console.log(this.cellar);
 	}
 
-	//todo add flatwine version
+	updateCellarFlat(cellarFlat: CellarFlat): void {
+		this.cellarFlat = cellarFlat;
+		this.filteredCellarFlat = cellarFlat;
+		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
+	}
+
 	/**
 	 * Retrieves the number of producers in the cellar.
 	 * @returns The number of producers in the cellar.
 	 */
 	getProducerCount(): number {
-		return Object.keys(this.cellar).length;
+		return this.getProducerNames().length;
 	}
 
 	// Additional utility methods can be added as needed
 }
 
-export default WineCellar;
+export default WineCellarFlat;
 
 // Example usage:
-const myCellar = new WineCellar();
-myCellar.addWine('Chateau Margaux', {
-	'Wine Name': 'Margaux 2015',
-	'Vineyard Location': 'Bordeaux, France',
-	Variety: 'Cabernet Sauvignon',
-	Vintage: 2015,
-	Bin: 'A1',
-	Qty: 10,
-	Purchased: '2020-01-01',
-	Notes: 'Excellent vintage'
-});
+// const myCellarFlat = new WineCellarFlat();
+// myCellarFlat.addWine("Chateau Margaux", {
+// 	"Wine Name": "Margaux 2015",
+// 	"Vineyard Location": "Bordeaux, France",
+// 	Variety: "Cabernet Sauvignon",
+// 	Vintage: 2015,
+// 	Bin: "A1",
+// 	Qty: 10,
+// 	Purchased: "2020-01-01",
+// 	Notes: "Excellent vintage"
+// });
+// console.log(myCellarFlat.getWinesByProducer("Chateau Margaux"));
+// // Output:
+// // [
+// // 	{
+// // 		"Wine Name": "Margaux 2015",
+// // 		"Vineyard Location": "Bordeaux, France",
+// // 		Variety: "Cabernet Sauvignon",
+// // 		Vintage: 2015,
+// // 		Bin: "A1",
+// // 		Qty: 10,
+// // 		Purchased: "2020-01-01",
+// // 		Notes: "Excellent vintage"
+// // 	}
+// // ]
 
 //console.log(myCellar.getWinesByProducer("Chateau Margaux"));

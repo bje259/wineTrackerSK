@@ -1,12 +1,13 @@
-import type { Cellar, Wine, CellarFlat, WineFlat } from './types';
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type { Cellar, CellarFlat, Wine, WineFlat } from './types';
 
 /**
  * @description Checks if an object is iterable.
- * @param obj 
+ * @param obj
  * @returns boolean
  */
-function isIterable(obj): boolean {
+function isIterable(obj: any): boolean {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
 
@@ -25,7 +26,6 @@ function isIterable(obj): boolean {
  */
 export class WineCellar {
 	cellar: Cellar;
-	cellarFlat: CellarFlat;
 
 	/**
 	 * The WineCellar class represents a collection of wines.
@@ -45,11 +45,8 @@ export class WineCellar {
 	 * 	Notes: "Excellent vintage"
 	 * });
 	 */
-	constructor(cell?: Cellar, cellFlat?: CellarFlat) {
-		if (cellFlat) this.cellarFlat = cellFlat;
-		else this.cellarFlat = [];
-		if (cell) this.cellar = cell;
-		else this.cellar = {};
+	constructor(cell?: Cellar) {
+		this.cellar = cell ? cell : {};
 	}
 
 	/**
@@ -87,18 +84,33 @@ export class WineCellar {
 	 * // 	}
 	 * // ]
 	 */
-	addWine(producer: string, wine: Wine): void {
-		const existingWine: Wine[] = this.cellar[producer] || [];
-		this.cellar[producer] = [...existingWine, wine];
-	}
 
-	/**
-	 * Adds a flatwine to cellar.  Check if a match exists, if so, return error to have user just update inventory
-	 *@todo
-	 */
-	addWineFlat(wineFlat: WineFlat): void {
-		const existingWine: WineFlat[] = this.cellarFlat || [];
-		this.cellarFlat = [...existingWine, wineFlat];
+	addWine(producer: string, wine: Wine): void;
+	addWine(wineFlat: WineFlat): void;
+	addWine(arg1: string | WineFlat, arg2?: Wine): void {
+		if (typeof arg1 === 'string') {
+			const producer = arg1;
+			const existingWine: Wine[] = this.cellar[producer] || [];
+			if (arg2) {
+				this.cellar[producer] = [...existingWine, arg2];
+			}
+		} else {
+			const producer = arg1.Producer;
+			for (const invItem of arg1.Inventory) {
+				const wine = {
+					'Wine Name': arg1['Wine Name'],
+					'Vineyard Location': arg1['Vineyard Location'],
+					Variety: arg1.Variety,
+					Vintage: invItem.Vintage,
+					Bin: invItem.Bin,
+					Qty: invItem.Qty,
+					Purchased: invItem.Purchased,
+					Notes: arg1.Notes
+				};
+				const existingWine: Wine[] = this.cellar[producer] || [];
+				this.cellar[producer] = [...existingWine, wine];
+			}
+		}
 	}
 
 	/**
@@ -112,7 +124,7 @@ export class WineCellar {
 	addProducer(producer: string): void {
 		this.cellar[producer] = [];
 	}
-//todo add flatwine version
+	//todo add flatwine version
 	/**
 	 * Removes a wine from the wine cellar.
 	 * @param producer - The producer of the wine.
@@ -156,7 +168,7 @@ export class WineCellar {
 		this.cellar = tempCellar;
 		return true;
 	}
-//todo add flatwine version
+	//todo add flatwine version
 	/**
 	 * Updates a wine given the producer and wine object.
 	 * @param producer - The producer of the wine.
@@ -366,7 +378,7 @@ export class WineCellar {
 	 * // ]
 	 */
 	getProducerNames(): { name: string; value: string }[] {
-		const producers = [];
+		const producers: { name: string; value: string }[] = [];
 		if (!isIterable(producers)) return [];
 		for (const producer in this.cellar) {
 			producers.push({ name: producer, value: producer });
@@ -508,11 +520,9 @@ export class WineCellar {
 		return undefined;
 	}
 
-/**
- * todo Check wine by producer, name, vineyard and variety
- */
-
-
+	/**
+	 * todo Check wine by producer, name, vineyard and variety
+	 */
 
 	//todo add flatwine version
 	/**
@@ -528,7 +538,7 @@ export class WineCellar {
 		return undefined;
 	}
 
-	//todo add flatwine version	
+	//todo add flatwine version
 	/**
 	 * Updates this.cellar for a specified producer with a wine array provided as a parameter.
 	 * @param producer - The name of the producer.

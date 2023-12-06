@@ -1,30 +1,40 @@
 <script lang="ts">
+import WineCellarFlat from '$lib/WineCellarFlat';
 import * as Card from '$lib/components/ui/card';
-import { myWineCellar } from '$lib/store';
-import type { Wine } from '$lib/types';
+import { myWineCellarFlat, storeExample } from '$lib/store';
+import type { CellarFlat, InvItem, Wine, WineFlat } from '$lib/types';
 import { Label } from 'flowbite-svelte';
-import { createEventDispatcher } from 'svelte';
+import { createEventDispatcher, onMount } from 'svelte';
 
-export let producer: string = 'Chateau Margaux';
-export let wine: Wine = {
-	'Wine Name': 'Margaux 2015',
-	'Vineyard Location': 'Bordeaux, France',
-	Variety: 'Cabernet Sauvignon',
-	Vintage: 2015,
-	Bin: 'A1',
-	Qty: 10,
-	Purchased: '2020-01-01',
-	Notes: 'Excellent vintage'
-};
-export let index: number = 0;
+export let producer: string = '';
+export let wine: Wine = {} as Wine;
+export let index: number;
+export let wineFlat: WineFlat;
+/*{
+	Producer: '',
+	'Wine Name': '',
+	'Vineyard Location': '',
+	Variety: '',
+	Inventory: [
+		{
+			Vintage: 0,
+			Bin: '',
+			Qty: 0,
+			Purchased: ''
+		}
+	],
+	Notes: ''
+};*/
+
+let invItem: InvItem[] = [] as InvItem[];
 
 const dispatch = createEventDispatcher();
 //todo update to use wineflat
 let tempWines: Wine[] = [];
-$: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
+//$: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
 
 //todo update to use wineflat
-function handleWineUpdated() {
+/* function handleWineUpdated() {
 	let storedValue = localStorage.getItem(producer) ?? '[]';
 	try {
 		tempWines = JSON.parse(storedValue);
@@ -32,127 +42,158 @@ function handleWineUpdated() {
 		console.error('Error parsing JSON from localStorage', error);
 		tempWines = [];
 	}
-	console.log(`ZY Wine handleWineUpdated - tempWines: ${tempWines}`);
+	console.log(`ZYyyyy Wine handleWineUpdated - tempWines: ${tempWines}`);
 	myWineCellar.update((current) => {
 		current.updateCellarByProducer(producer, tempWines);
 		return current;
 	});
-	tempWines = [];
-	dispatch('wineUpdated');
-}
-//todo update to use wineflat
-function qtyIncrement() {
-	console.log(`ZY Wine qtyIncrement - producer: ${producer} - wine:`);
-	console.log(wine);
-	console.log(`ZY Wine qtyIncrement - wine.Qty: ${wine.Qty}`);
+	tempWines = []; */
+dispatch('wineUpdated');
+/* } */
 
-	wine.Qty = wine.Qty + 1;
-	console.log(`ZY Wine qtyIncrement - wine.Qty: ${wine.Qty}`);
-	let storedValue = localStorage.getItem(producer) ?? '[]';
+onMount(() => {
+	invItem = [
+		{
+			Vintage: wineFlat.Inventory[index].Vintage,
+			Bin: wineFlat.Inventory[index].Bin,
+			Qty: wineFlat.Inventory[index].Qty,
+			Purchased: wineFlat.Inventory[index].Purchased
+		}
+	];
+let vint = 0;
+	console.log('Zyyyyyyyoriginl mounted InvMgmt wineFlat:',wineFlat);
+	//console.log(wineFlat);
+	console.log('Zyyyyindex receivd?',index);
+	//console.log(index);
+	const tmpWine: Wine | undefined = $myWineCellarFlat.checkWineByNameVintage(wine['Wine Name'], vint as number);
+	producer = 'Chateau Margaux';
+	wine = {
+		'Wine Name': 'Margaux 2015',
+		'Vineyard Location': 'Bordeaux, France',
+		Variety: 'Cabernet Sauvignon',
+		Vintage: 2015,
+		Bin: 'A1',
+		Qty: 10,
+		Purchased: '2020-01-01',
+		Notes: 'Excellent vintage'
+	};
+	invItem = [
+		{
+			Vintage: 2015,
+			Bin: 'A1',
+			Qty: 10,
+			Purchased: '2020-01-01'
+		}
+	];
+});
+
+//todo update to use wineflat
+function qtyIncrement(e: MouseEvent) {
+	console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`,producer, wineFlat);
+	//console.log(wineFlat);
+	console.log(`Zyyyyyyyy Wine qtyIncrement - wineFlat.Qty: for index`,index,invItem[0].Qty);
+
+	invItem[0].Qty = invItem[0].Qty + 1;
+	console.log(`Zyyyyyyy Wine qtyIncrement - wineFlat.Qty: `,invItem[0].Qty);
+	let storedCellar: CellarFlat = [];
 	try {
-		tempWines = JSON.parse(storedValue);
-		console.log(`ZY Wine qtyIncrement - pulled producer's wines from local storage:`);
-		console.log(tempWines);
-		myWineCellar.update((current) => {
-			current.updateCellarByProducer(producer, tempWines);
+		storedCellar = (JSON.parse($storeExample) as CellarFlat) ?? [];
+		console.log(`Zyyyyyyy Wine qtyIncrement - pulled producer's wines from local storage:`);
+		console.log(storedCellar);
+		myWineCellarFlat.update((current) => {
+			current.updateCellarFlat(storedCellar);
 			return current;
 		});
-		console.log('Updated myWineCellar with tempWines');
-		console.log($myWineCellar.getWinesByProducer(producer));
-		myWineCellar.update((current) => {
-			current.updateWine(producer, wine, index);
+		console.log('ZyyyyUpdated myWineCellar with storedCellarFlat');
+		console.log($myWineCellarFlat.getWinesByProducer(producer));
+		myWineCellarFlat.update((current) => {
+			current.updateWine(producer, WineCellarFlat.convertWineFlatToWine(wineFlat), index);
 			return current;
 		});
-		console.log(`Updated myWineCellar with wine
-				${wine['Wine Name']}
-				${wine.Qty}`);
-		console.log('New myWineCellar wine entry:');
-		console.log($myWineCellar.getWinesByProducerWineName(producer, wine['Wine Name']));
-		console.log('updating local storage');
-		tempWines = $myWineCellar.getWinesByProducer(producer);
-		let tempWinesString = JSON.stringify(tempWines);
-		localStorage.setItem(producer, tempWinesString);
-		console.log('local storage updated');
+		console.log(`ZyyyyyUpdated myWineCellar with wine
+				${wineFlat['Wine Name']}
+				${invItem[0].Qty}`);
+		console.log('ZyyyyyNew myWineCellar wine entry:');
+		console.log($myWineCellarFlat.getWinesByProducerWineName(producer, wine['Wine Name']));
+		console.log('Zyyyyupdating local storage');
+		storedCellar = $myWineCellarFlat.getCellarFlat();
+		$storeExample = JSON.stringify(storedCellar);
+		console.log('Zyyyylocal storage updated');
 	} catch (error) {
 		console.error('Error parsing JSON from localStorage', error);
-		tempWines = [];
+		storedCellar = [];
 	}
-	tempWines = [];
+	storedCellar = [];
 	dispatch('wineUpdated');
 }
-//todo update to use wineflat
-function qtyDecrement() {
-	console.log(`ZY Wine qtyDecrement - producer: ${producer} - wine:`);
-	console.log(wine);
-	console.log(`ZY Wine qtyDecrement - wine.Qty: ${wine.Qty}`);
-	if (wine.Qty > 0) {
-		wine.Qty = wine.Qty - 1;
-		console.log(`ZY Wine qtyDecrement - wine.Qty: ${wine.Qty}`);
-		let storedValue = localStorage.getItem(producer) ?? '[]';
-		try {
-			tempWines = JSON.parse(storedValue);
-			console.log(`ZY Wine qtyDecrement - pulled producer's wines from local storage:`);
-			console.log(tempWines);
-			myWineCellar.update((current) => {
-				current.updateCellarByProducer(producer, tempWines);
-				return current;
-			});
-			console.log('Updated myWineCellar with tempWines');
-			console.log($myWineCellar.getWinesByProducer(producer));
-			myWineCellar.update((current) => {
-				current.updateWine(producer, wine, index);
-				return current;
-			});
-			console.log(`Updated myWineCellar with wine
-				${wine['Wine Name']}
-				${wine.Qty}`);
-			console.log('New myWineCellar wine entry:');
-			console.log($myWineCellar.getWinesByProducerWineName(producer, wine['Wine Name']));
-			console.log('updating local storage');
-			tempWines = $myWineCellar.getWinesByProducer(producer);
-			let tempWinesString = JSON.stringify(tempWines);
-			localStorage.setItem(producer, tempWinesString);
-			console.log('local storage updated');
-		} catch (error) {
-			console.error('Error parsing JSON from localStorage', error);
-			tempWines = [];
-		}
 
-		tempWines = [];
-		dispatch('wineUpdated');
-	} else {
-		console.log('Error wine cannot go below 0');
+//todo update to use wineflat
+function qtyDecrement(e: MouseEvent): void {
+	console.log(`Zyyyyyyyy Wine qtyDecrement - producer: ${producer} - wine:`);
+	console.log(wineFlat);
+	console.log(`Zyyyyyyy Wine qtyDecrement - wineFlat.Qty: ${invItem[0].Qty}`);
+
+	invItem[0].Qty = invItem[0].Qty - 1;
+	console.log(`Zyyyyyyy Wine qtyDecrement - wineFlat.Qty: ${invItem[0].Qty}for index ${index}`);
+	let storedCellar: CellarFlat = [];
+	try {
+		storedCellar = (JSON.parse($storeExample) as CellarFlat) ?? [];
+		console.log(`Zyyyyyyy Wine qtyDecrement - pulled producer's wines from local storage:`);
+		console.log(storedCellar);
+		myWineCellarFlat.update((current) => {
+			current.updateCellarFlat(storedCellar);
+			return current;
+		});
+		console.log('ZyyyyyUpdated myWineCellar with storedCellarFlat');
+		console.log($myWineCellarFlat.getWinesByProducer(producer));
+		myWineCellarFlat.update((current) => {
+			current.updateWine(producer, WineCellarFlat.convertWineFlatToWine(wineFlat), index);
+			return current;
+		});
+		console.log(`ZyyyyUpdated myWineCellar with wine
+				${wineFlat['Wine Name']}
+				${invItem[0].Qty}`);
+		console.log('ZyyyyNew myWineCellar wine entry:');
+		console.log($myWineCellarFlat.getWinesByProducerWineName(producer, wine['Wine Name']));
+		console.log('Zyyyyupdating local storage');
+		storedCellar = $myWineCellarFlat.getCellarFlat();
+		$storeExample = JSON.stringify(storedCellar);
+		console.log('Zyyyylocal storage updated');
+	} catch (error) {
+		console.error('Error parsing JSON from localStorage', error);
+		storedCellar = [];
 	}
+	storedCellar = [];
+	dispatch('wineUpdated');
 }
+
+//setContext('decrement', qtyDecrement);
 
 //todo update to use wineflat
 function deleteWine() {
-	console.log(`ZY Wine deleteWine - wine: ${wine}`);
-	console.log(`ZY Wine deleteWine - wine.Qty: ${wine.Qty}`);
-	if (wine.Qty > 0) {
-		wine.Qty = 0;
-		console.log(`ZY Wine deleteWine - wine.Qty: ${wine.Qty}`);
-		let storedValue = localStorage.getItem(producer) ?? '[]';
+	console.log(`Zyyyy Wine deleteWine - wine: ${wineFlat}`);
+	console.log(`Zyyyy Wine deleteWine - wineFlat.Qty: ${invItem[0].Qty}`);
+	if (invItem[0].Qty > 0) {
+		invItem[0].Qty = 0;
+		console.log(`ZY Wine deleteWine - wineFlat.Qty: ${invItem[0].Qty}`);
+		let storedValue = $storeExample ?? '[]';
+		let storedCellar: CellarFlat = [];
 		try {
-			tempWines = JSON.parse(storedValue);
+			storedCellar = JSON.parse(storedValue);
 			console.log(`ZY Wine delete wine - pulled producer's wines from local storage:`);
-			console.log(tempWines);
-			tempWines.splice(index, 1);
-			if (tempWines.length === 0) {
-				localStorage.removeItem(producer);
-			} else {
-				localStorage.setItem(producer, JSON.stringify(tempWines));
-			}
-			myWineCellar.update((current) => {
-				current.updateCellarByProducer(producer, tempWines);
+			console.log(storedCellar);
+			storedCellar.splice(index, 1);
+			$storeExample = JSON.stringify(storedCellar);
+			myWineCellarFlat.update((current) => {
+				current.updateCellarFlat(storedCellar);
 				return current;
 			});
 		} catch (error) {
 			console.error('Error parsing JSON from localStorage', error);
-			ownedWines = [];
+			storedCellar = [];
 		}
 		console.log('Updated myWineCellar with tempWines');
-		console.log($myWineCellar.getWinesByProducer(producer));
+		console.log($myWineCellarFlat.getWinesByProducer(producer));
 		tempWines = [];
 		console.log('dispatching wineUpdated');
 
@@ -160,36 +201,38 @@ function deleteWine() {
 	}
 }
 </script>
-<!-- todo update for wineflat-->
-<Card.Root class="w-[200px] justify-center">
-	<Card.Content class="p-3">
-		<div class="flex flex-col">
-			<div class="flex flex-auto justify-between">
-				<p class="mb-4 text-base">
-					Vintage: {wine.Vintage ? `${wine.Vintage} ` : ""}
-					<br />Bin: {wine.Bin ? `${wine.Bin} ` : ""}
-					{#if wine.Purchased}<br />Purchase Date: {wine.Purchased ? `${wine.Purchased} ` : ""}{/if}
-				</p>
-				<button
-					class="variant-soft chip justify-around self-start hover:variant-filled"
-					on:click={deleteWine}
-				>
-					<span>❌</span>
-				</button>
-			</div>
 
-			<Label
-				for="counter-input-example"
-				class="flex-shrink-1 bottom-0 col-span-2 mb-1 block content-end self-start text-sm font-medium text-gray-900 dark:text-white"
-				>Choose quantity:</Label
-			>
-			<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
-				<div class="variant-filled bg-secondary-400-500-token btn-group dark:divide-gray-700">
-					<button class="w-12" on:click={qtyDecrement}>-</button>
-					<Label class="w-12 p-2 text-center dark:text-black">{wine.Qty}</Label>
-					<button class="w-12" on:click={qtyIncrement}>+</button>
+{#if wineFlat && invItem[0]}
+	<Card.Root class="w-[200px] justify-center">
+		<Card.Content class="p-3">
+			<div class="flex flex-col">
+				<div class="flex flex-auto justify-between">
+					<p class="mb-4 text-base">
+						Vintage: {invItem[0].Vintage? invItem[0].Vintage : 'N/A'}
+						<br />Bin: {invItem[0].Bin? invItem[0].Bin : 'N/A'}
+						{#if invItem[0].Purchased}<br />Purchase Date: {invItem[0].Purchased}{/if}
+					</p>
+					<button
+						class="variant-soft chip justify-around self-start hover:variant-filled"
+						on:click={deleteWine}
+					>
+						<span>❌</span>
+					</button>
+				</div>
+
+				<Label
+					for="counter-input-example"
+					class="flex-shrink-1 bottom-0 col-span-2 mb-1 block content-end self-start text-sm font-medium text-gray-900 dark:text-white"
+					>Choose quantity:</Label
+				>
+				<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
+					<div class="variant-filled bg-secondary-400-500-token btn-group dark:divide-gray-700">
+						<button class="w-12" on:click={qtyDecrement}>-</button>
+						<Label class="w-12 p-2 text-center dark:text-black">{invItem[0].Qty}</Label>
+						<button class="w-12" on:click={qtyIncrement}>+</button>
+					</div>
 				</div>
 			</div>
-		</div>
-	</Card.Content>
-</Card.Root>
+		</Card.Content>
+	</Card.Root>
+{/if}

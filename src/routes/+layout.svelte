@@ -1,10 +1,18 @@
 <script lang="ts">
+	import { WineCellar } from './../lib/WineCellar';
 console.log('App.svelte called');
-import { browser } from '$app/environment';
-import { invalidateAll } from '$app/navigation';
-import { myWineCellar, ownedWinesString } from '$lib/store.js';
-import type { Cellar, Wine } from '$lib/types';
-import { AppBar, LightSwitch, localStorageStore } from '@skeletonlabs/skeleton';
+import {browser} from '$app/environment';
+import InventoryMgmt from '$lib/InventoryMgmt.svelte';
+import WineCellarFlat from '$lib/WineCellarFlat';
+import {
+	myWineCellar,
+	myWineCellarFlat,
+	ownedWinesString,
+	storeExample,
+	useNewDataType
+} from '$lib/store.js';
+import type { Cellar, CellarFlat, Wine, WineFlat } from '$lib/types';
+import { AppBar, LightSwitch } from '@skeletonlabs/skeleton';
 import {
 	Button,
 	CloseButton,
@@ -34,6 +42,7 @@ import { sineIn } from 'svelte/easing';
 import { writable, type Writable } from 'svelte/store';
 import '../app.pcss';
 import presetList from '../lib/presetList.json';
+import presetListupdateforFlat from '../lib/presetListupdateforFlat.json';
 import Header from './Header.svelte';
 import './styles.css';
 let hidden2 = true;
@@ -44,17 +53,16 @@ let transitionParams = {
 	easing: sineIn
 };
 
-//todo update imports and declarations for wineflat
 // import EventTarget from 'svelte';
 
-const storeExample: Writable<string> = localStorageStore('storeExample', 'initialValueHere');
 const eventListenerStore: Writable<EventTarget> = writable();
-const debugMode = true;
+const debugMode = false;
 setContext('eventListener', eventListenerStore);
 setContext('debugMode', debugMode);
 //let ownedWinesString = "";
 let importWinesString = '';
 let cellar: Cellar = $myWineCellar.getCellar();
+let cellarFlat: CellarFlat = [];
 
 let searchParams: { [paramName: string]: { name: string; value: string }[] } = {
 	producer: [{ name: 'All Producers', value: '' }],
@@ -77,14 +85,23 @@ let importModal = false;
 let exportModal = false;
 const dispatch = createEventDispatcher();
 
-function isIterable(obj) {
+function isIterable(obj: any) {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
 
 //todo update to use wineflat
+//rdy for bool
 function loadOwnedWinesInitial(): Cellar {
 	const loadedOwnedWines: Cellar = {};
+	let tmpCellar: CellarFlat = [];
+	if (browser) {
+		console.log('xxxxxloading cell flat from storage store');
+		tmpCellar = JSON.parse($storeExample) as CellarFlat;
+		$myWineCellarFlat.updateCellarFlat(tmpCellar);
+		cellarFlat = tmpCellar;
+	}
 	let count = 0;
+	if (!$useNewDataType) return WineCellarFlat.convertToCellar(tmpCellar);
 	for (let i = 0; localStorage && i < localStorage.length && count < 10; i++) {
 		const key = localStorage.key(i) || '[]';
 		console.log(`key ${key} in blackList ${blackList.includes(key)}`);
@@ -104,19 +121,42 @@ function loadOwnedWinesInitial(): Cellar {
 	}
 	console.log('init loadfromstorage loadedOwnedWines /n');
 	console.log(loadedOwnedWines);
+	console.log(JSON.parse($storeExample));
+	//console.log($myWineCellar.getCellar());
 	if (Object.keys(loadedOwnedWines).length > 0) initialQuickload = true;
 	return loadedOwnedWines;
 }
 
+$: if (browser) {
+	console.log(
+		'XxXxXtrying to output cellar flat' + $myWineCellarFlat.getCellarFlat().length || 'Fail'
+	);
+	console.log($myWineCellar.getAllWinesFlat());
+	console.log('Updating flat from store');
+	let tmpCellar: CellarFlat = [];
+	if (browser) {
+		console.log('xxxxxloading cell flat from storage store');
+		tmpCellar = JSON.parse($storeExample) as CellarFlat;
+		$myWineCellarFlat.updateCellarFlat(tmpCellar);
+	}
+}
 $: if (browser && !initialQuickload) {
 	$myWineCellar.updateCellar(loadOwnedWinesInitial());
-	invalidateAll();
+	//invalidateAll();
 }
 //todo update to use wineflat
-function loadOwnedWinesFromLocalStorage(): Cellar {
-	const loadedOwnedWines: Cellar = {};
-	if (debugMode) return loadedOwnedWines;
-	for (let i = 0; localStorage && i < localStorage.length; i++) {
+//rdy for bool
+ function loadOwnedWinesFromLocalStorage(): CellarFlat {
+	let tmpCellar: CellarFlat = [];
+	if (browser) {
+		console.log('xxxxxloading cell flat from storage store');
+		tmpCellar = JSON.parse($storeExample) as CellarFlat;
+		$myWineCellarFlat.updateCellarFlat(tmpCellar);
+	}
+
+		return tmpCellar;
+	
+	/*for (let i = 0; localStorage && i < localStorage.length; i++) {
 		const key = localStorage.key(i) || '[]';
 		console.log(`key ${key} in blackList ${blackList.includes(key)}`);
 		if (key && !blackList.includes(key)) {
@@ -134,27 +174,42 @@ function loadOwnedWinesFromLocalStorage(): Cellar {
 	}
 	console.log('loadfromstorage loadedOwnedWines /n');
 	console.log(loadedOwnedWines);
-	return loadedOwnedWines;
+	return loadedOwnedWines;*/
 }
+
 //todo update to use wineflat
+//rdy for bool
 function handleWinesUpdated() {
 	// Update the local data or trigger a refresh
-	let tempCellar: Cellar = loadOwnedWinesFromLocalStorage();
+	let tmpCellar: CellarFlat = [];
+	if (browser) {
+		console.log('xxxxxloading cell flat from storage store');
+		tmpCellar = JSON.parse($storeExample) as CellarFlat;
+		$myWineCellarFlat.updateCellarFlat(tmpCellar);
+	}
+	if ($useNewDataType) {
+		$ownedWinesString = JSON.stringify($myWineCellarFlat.getCellarFlat());
+		updateDDLs();
+		return;
+	}
+	let tempCellar: CellarFlat = loadOwnedWinesFromLocalStorage();
 	console.log('handleWinesUpdated (App.svelte) called loading from local storage');
-	$myWineCellar.updateCellar(tempCellar);
+	$myWineCellarFlat.updateCellarFlat(tempCellar);
 	$ownedWinesString = JSON.stringify(tempCellar);
 	//if (browser) $storeExample = JSON.stringify(tempCellar);
 	updateDDLs();
 }
-//todo update to use wineflat, make match +page version
+
 function addOptions(paramKey: string, newOptions: { name: string; value: string }[]) {
 	if (searchParams[paramKey]) {
 		searchParams[paramKey] = [...searchParams[paramKey], ...newOptions];
 	} else {
 		// Optionally handle the case where the paramKey does not exist
+		searchParams[paramKey] = newOptions;
 	}
 }
 //todo update to use wineflat
+//rdy for bool
 function updateDDLs() {
 	console.log('updateDDLs called  - reseting searchParams');
 	searchParams = {
@@ -162,16 +217,29 @@ function updateDDLs() {
 		variety: [{ name: 'All Varieties', value: '' }],
 		vineyard: [{ name: 'All Vineyards', value: '' }]
 	};
-	if ($myWineCellar.getProducerCount() > 0) {
+	if ($useNewDataType && $myWineCellarFlat.getProducerCount() > 0) {
+		console.log('updateDDLs called  - adding searchParams');
+		$myWineCellarFlat.getProducerNames().forEach((element) => console.log(element.name));
+		addOptions('producer', $myWineCellarFlat.getProducerNames());
+		addOptions('variety', $myWineCellarFlat.getVarietyNames());
+		addOptions('vineyard', $myWineCellarFlat.getVineyardNames());
+		console.log('updateDDLs searchParams');
+		console.log(searchParams);
+		return;
+	}
+
+	if ($myWineCellar.getProducerCount() > 0 && !$useNewDataType) {
 		console.log('updateDDLs called  - adding searchParams');
 		$myWineCellar.getProducerNames().forEach((element) => console.log(element.name));
 		addOptions('producer', $myWineCellar.getProducerNames());
 		addOptions('variety', $myWineCellar.getVarietyNames());
 		addOptions('vineyard', $myWineCellar.getVineyardNames());
-		console.log('updateDDLs searchParams');
+		console.log('updateDDLs searchParams using old data');
 		console.log(searchParams);
 	}
 }
+
+$: console.log($myWineCellarFlat.getProducerCount());
 
 async function loadDataAsync() {
 	const data = loadOwnedWinesFromLocalStorage();
@@ -183,9 +251,10 @@ async function loadDataAsync() {
 onMount(async () => {
 	const data = await loadDataAsync();
 	if (!debugMode) {
-		$myWineCellar.updateCellar(data);
+		//$myWineCellar.updateCellar(data);
 		dispatch('wineUpdated', { detail: 'wineUpdated' });
-		cellar = data;
+		cellar = WineCellarFlat.convertToCellar(data);
+		cellarFlat = browser ? (JSON.parse($storeExample) as CellarFlat) : [];
 		//cellar = $myWineCellar.getCellar();
 		console.log('onMount called loading from local storage');
 		//console.log($myWineCellar.getCellar());
@@ -196,6 +265,14 @@ onMount(async () => {
 
 function importData(_e: MouseEvent): void {
 	if (importWinesString === '') {
+		return;
+	}
+	if ($useNewDataType) {
+		let importWinesFlat: CellarFlat = JSON.parse(importWinesString) as CellarFlat;
+		$myWineCellarFlat.updateCellarFlat(importWinesFlat);
+		$storeExample = JSON.stringify(importWinesFlat);
+		importWinesString = '';
+		importModal = false;
 		return;
 	}
 	const importWines: Cellar = JSON.parse(importWinesString) as Cellar;
@@ -221,9 +298,19 @@ function copyText(_e: MouseEvent): void {
 		});
 }
 //todo update to use wineflat
+//rdy for bool
 function loadPreset() {
 	//$myWineCellar.updateCellar(presetList);
 	// Save owned Wines to local storage
+	if ($useNewDataType) {
+		let importWinesFlat: CellarFlat = presetListupdateforFlat;
+		$myWineCellarFlat.updateCellarFlat(importWinesFlat);
+		$storeExample = JSON.stringify(importWinesFlat);
+		importWinesString = '';
+		importModal = false;
+		return;
+	}
+
 	let importWines: Cellar = presetList;
 	for (const key in importWines) {
 		const values = importWines[key];
@@ -233,24 +320,32 @@ function loadPreset() {
 	console.log(presetList);
 	//updateDDLs();
 	cellar = $myWineCellar.getCellar();
-
+	cellarFlat = browser ? (JSON.parse($storeExample) as CellarFlat) : [];
 	//dispatch("wineUpdated", { detail: "wineUpdated" });
 }
 
-$: if (cellar) {
+$: if (cellar && browser && !$useNewDataType) {
 	$ownedWinesString = JSON.stringify(cellar);
+	//if (browser) $storeExample=JSON.stringify(cellar);
+}
+
+$: if (cellarFlat && browser && $useNewDataType) {
+	$ownedWinesString = cellarFlat ? JSON.stringify(cellarFlat) : '[]';
 	//if (browser) $storeExample=JSON.stringify(cellar);
 }
 
 $: eventListenerStore.subscribe((eventListener) => {
 	if (eventListener) {
-		eventListener.addEventListener('wineUpdated', (e: CustomEvent) => {
-			console.log('Event received in layout:', e.detail);
+		eventListener.addEventListener('wineUpdated', (e: Event) => {
+			const customEvent = e as CustomEvent<any>;
+			console.log('Event received in layout:', customEvent.detail);
 			handleWinesUpdated();
 		});
 	}
 });
+
 </script>
+
 <!--tododecide if drawer is needed for production potential make it dev tools using secret localstorage value-->
 <Drawer
 	transitionType="fly"
@@ -284,15 +379,16 @@ $: eventListenerStore.subscribe((eventListener) => {
 						/>
 					</svelte:fragment>
 				</SidebarItem>
-				<SidebarDropdownWrapper label="E-commerce">
+				<SidebarDropdownWrapper label="Button Testing">
 					<svelte:fragment slot="icon">
 						<ShoppingCartSolid
 							class="h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
 						/>
 					</svelte:fragment>
-					<SidebarDropdownItem label="Products" />
-					<SidebarDropdownItem label="Billing" />
-					<SidebarDropdownItem label="Invoice" />
+					<SidebarDropdownItem  label="Decrement" />
+					<SidebarDropdownItem  label="Increment" />
+					<SidebarDropdownItem label = "test"/>
+
 				</SidebarDropdownWrapper>
 				<SidebarItem label="Kanban" spanClass={spanClass}>
 					<svelte:fragment slot="icon">
@@ -395,7 +491,13 @@ $: eventListenerStore.subscribe((eventListener) => {
 
 <div class="app">
 	<Header></Header>
-
+	<InventoryMgmt
+				producer = {cellarFlat[0].Producer}
+				wineFlat={cellarFlat[0]}
+				wine={cellar[0][0]}
+				index={0}
+				on:wineUpdated={handleWinesUpdated}
+			/>
 	<main>
 		<slot />
 	</main>

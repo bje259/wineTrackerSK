@@ -14,6 +14,14 @@ module.exports = {
 		ecmaVersion: 2020,
 		extraFileExtensions: ['.svelte']
 	},
+	rules: {
+		'no-unused-vars': 'off',
+		'@typescript-eslint/no-unused-vars': ['warn'],
+		'@typescript-eslint/no-var-requires': 'off',
+		'@typescript-eslint/explicit-module-boundary-types': 'off',
+		'prefer-const': 'off',
+		'no-explicit-any': 'off'
+	},
 	env: {
 		browser: true,
 		es2017: true,

@@ -1,9 +1,10 @@
 <script lang="ts">
 //import WineCellar from './WineCellar';
-import { Button, Label } from 'flowbite-svelte';
 import { createEventDispatcher } from 'svelte';
-import { myWineCellar } from './store';
-import type { Wine } from './types';
+import InventoryMgmt from './InventoryMgmt.svelte';
+import WineCellarFlat from './WineCellarFlat';
+import { myWineCellar, myWineCellarFlat, storeExample } from './store';
+import type { CellarFlat, Wine, WineFlat } from './types';
 
 // increment the value of the input field
 //counterInput.increment();
@@ -17,65 +18,65 @@ const dispatch = createEventDispatcher();
 export let producer: string;
 export let wine: Wine;
 export let index: number;
+export let wineFlat: WineFlat;
 
 let tempWines: Wine[] = [];
-$: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
+$: ownedWines = $myWineCellarFlat.getWinesByProducer(producer) || [];
 
 //todo update to just pass along to parent
 function handleWineUpdated() {
-	let storedValue = localStorage.getItem(producer) ?? '[]';
+	/*let storedCellarFlat: CellarFlat = [];
 	try {
-		tempWines = JSON.parse(storedValue);
+		storedCellarFlat = JSON.parse($storeExample);
 	} catch (error) {
 		console.error('Error parsing JSON from localStorage', error);
-		tempWines = [];
+		storedCellarFlat = [];
 	}
-	console.log(`ZZ Wine handleWineUpdated - tempWines: ${tempWines}`);
-	myWineCellar.update((current) => {
-		current.updateCellarByProducer(producer, tempWines);
+	console.log(`ZZ Wine handleWineUpdated - tempWines: ${storedCellarFlat}`);
+	myWineCellarFlat.update((current) => {
+		current.updateCellarFlat(storedCellarFlat);
 		return current;
 	});
-	tempWines = [];
+	tempWines = [];*/
 	dispatch('wineUpdated');
 }
 //todo update to use wineflat
 function qtyIncrement() {
 	console.log(`ZZ Wine qtyIncrement - producer: ${producer} - wine:`);
-	console.log(wine);
-	console.log(`ZZ Wine qtyIncrement - wine.Qty: ${wine.Qty}`);
+	console.log(wineFlat);
+	console.log(`ZZ Wine qtyIncrement - wine.Qty: ${wineFlat.Inventory[index].Qty}`);
 
-	wine.Qty = wine.Qty + 1;
-	console.log(`ZZ Wine qtyIncrement - wine.Qty: ${wine.Qty}`);
-	let storedValue = localStorage.getItem(producer) ?? '[]';
+	wineFlat.Inventory[index].Qty = wineFlat.Inventory[index].Qty + 1;
+	console.log(`ZZ Wine qtyIncrement - wine.Qty: ${wineFlat.Inventory[index].Qty}`);
+	let storedCellar: CellarFlat = [];
 	try {
-		tempWines = JSON.parse(storedValue);
+		storedCellar = (JSON.parse($storeExample) as CellarFlat) ?? [];
 		console.log(`ZZ Wine qtyIncrement - pulled producer's wines from local storage:`);
-		console.log(tempWines);
-		myWineCellar.update((current) => {
-			current.updateCellarByProducer(producer, tempWines);
+		console.log(storedCellar);
+		myWineCellarFlat.update((current) => {
+			current.updateCellarFlat(storedCellar);
 			return current;
 		});
-		console.log('Updated myWineCellar with tempWines');
-		console.log($myWineCellar.getWinesByProducer(producer));
+		console.log('Updated myWineCellar with storedCellarFlat');
+		console.log($myWineCellarFlat.getWinesByProducer(producer));
 		myWineCellar.update((current) => {
-			current.updateWine(producer, wine, index);
+			current.updateWine(producer, WineCellarFlat.convertWineFlatToWine(wineFlat), index);
 			return current;
 		});
 		console.log(`Updated myWineCellar with wine
-				${wine['Wine Name']}
-				${wine.Qty}`);
+				${wineFlat['Wine Name']}
+				${wineFlat.Inventory[index].Qty}`);
 		console.log('New myWineCellar wine entry:');
-		console.log($myWineCellar.getWinesByProducerWineName(producer, wine['Wine Name']));
+		console.log($myWineCellarFlat.getWinesByProducerWineName(producer, wine['Wine Name']));
 		console.log('updating local storage');
-		tempWines = $myWineCellar.getWinesByProducer(producer);
-		let tempWinesString = JSON.stringify(tempWines);
-		localStorage.setItem(producer, tempWinesString);
+		storedCellar = $myWineCellarFlat.getCellarFlat();
+		$storeExample = JSON.stringify(storedCellar);
 		console.log('local storage updated');
 	} catch (error) {
 		console.error('Error parsing JSON from localStorage', error);
-		tempWines = [];
+		storedCellar = [];
 	}
-	tempWines = [];
+	storedCellar = [];
 	dispatch('wineUpdated');
 }
 //todo update to use wineflat
@@ -157,6 +158,7 @@ function deleteWine() {
 	}
 }
 </script>
+
 <!-- todo use each loop to create inventory management cards-->
 <div class="mb-8 flex flex-col">
 	<h3 class="left-0 mb-2 text-lg font-medium text-amber-600">
@@ -164,49 +166,21 @@ function deleteWine() {
 			? `(${wine.Variety})`
 			: ""}
 	</h3>
-	<div class="flex flex-col">
-		<div class="grid grid-cols-3">
-			<p class="mb-4 flex-grow text-base">
-				Vintage: {wine.Vintage ? `${wine.Vintage} ` : ""}
-				<br />Bin: {wine.Bin ? `${wine.Bin} ` : ""}
-			</p>
-			<Button class="col-start-3 flex-shrink-0 self-start justify-self-end" on:click={deleteWine}
-				>Delete</Button
-			>
-		</div>
-		<div
-			class="flex-shrink-1 col-start-1 col-end-4 ml-2 grid grid-flow-col grid-cols-6 grid-rows-2 gap-1 divide-x overflow-hidden rounded-lg rtl:flex-row-reverse"
-		>
-			<Label
-				for="counter-input-example"
-				class="flex-shrink-1 bottom-0 col-span-2 mb-1 block content-end self-end text-sm font-medium text-gray-900 dark:text-white"
-				>Choose quantity:</Label
-			>
-			<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
-				<Button
-					type="button"
-					class="fon inline-flex h-5 w-5 flex-shrink-0  items-center justify-center rounded-md border-transparent   bg-gray-100 text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-					on:click={qtyDecrement}
-				>
-					-
-				</Button>
+	<div class="flex flex-row">
+		{#each wineFlat.Inventory as inv, index (inv)}
+			<InventoryMgmt
+				producer={producer}
+				wineFlat={wineFlat}
+				wine={wine}
+				index={index}
+				on:wineUpdated={handleWineUpdated}
+			/>
+		{/each}
 
-				<Label class=" inline-flex">Qty: {Number.isFinite(wine.Qty) ? `${wine.Qty} ` : ""}</Label>
-				<Button
-					type="button"
-					class="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border border-gray-300 bg-gray-100 text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-700"
-					on:click={qtyIncrement}
-				>
-					+
-				</Button>
-			</div>
-		</div>
-		<p class="mb-4 flex-grow text-base">
-			<br />Purchase Date: {wine.Purchased ? `${wine.Purchased} ` : ""}
-			{#if wine.Notes !== undefined && wine.Notes !== null && wine.Notes !== ""}
-				<br />
+		{#if wine.Notes !== undefined && wine.Notes !== null && wine.Notes !== ""}
+			<p>
 				Notes: {wine.Notes}
-			{/if}
-		</p>
+			</p>
+		{/if}
 	</div>
 </div>

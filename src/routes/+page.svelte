@@ -1,9 +1,11 @@
 <script lang="ts">
+import { browser } from '$app/environment';
 import AddSpecificWine from '$lib/AddSpecificWine.svelte';
+import WineCellarFlat from '$lib/WineCellarFlat';
 import WineComp from '$lib/WineComp.svelte';
 import { Skeleton } from '$lib/components/ui/skeleton';
-import { myWineCellar } from '$lib/store.js';
-import type { Cellar, Wine } from '$lib/types';
+import { myWineCellar, myWineCellarFlat, storeExample, useNewDataType } from '$lib/store.js';
+import type { Cellar, CellarFlat, Wine, WineFlat } from '$lib/types';
 import { Button, CloseButton, Input, Select } from 'flowbite-svelte';
 import { createEventDispatcher, onMount } from 'svelte';
 import type { Writable } from 'svelte/store';
@@ -20,7 +22,7 @@ let selectedProducer = '';
 let selectedVariety = '';
 let selectedVineyard = '';
 //let ownedWinesString = "";
-let debugMode = true;
+let debugMode = false;
 let searchParams: { [paramName: string]: { name: string; value: string }[] } = {
 	producer: [{ name: 'All Producers', value: '' }],
 	variety: [{ name: 'All Varieties', value: '' }],
@@ -28,6 +30,10 @@ let searchParams: { [paramName: string]: { name: string; value: string }[] } = {
 };
 const dispatch = createEventDispatcher();
 let cellar: Cellar = $myWineCellar.getCellar();
+let cellarFlat: CellarFlat = [];
+let producerList: string[] = [];
+let sortedWines: { [producer: string]: WineFlat[] } = {};
+let showThisWine: { [Producer: string]: boolean } = {};
 
 import { getContext } from 'svelte';
 
@@ -56,10 +62,11 @@ function isIterable(obj) {
 // todo this shouldn't need to happen twice skip myWinceCellar.updateCellar
 // Load owned aspects from local storage on component mount
 onMount(() => {
-	if (!debugMode) {
+	eventListenerStore.set(document);
+	dispatch('wineUpdated', { detail: 'wineUpdated' });
+	if (!debugMode && !$useNewDataType) {
 		$myWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
-		eventListenerStore.set(document);
-		dispatch('wineUpdated', { detail: 'wineUpdated' });
+
 		cellar = $myWineCellar.getCellar();
 		console.log('onMount called loading from local storage');
 		console.log($myWineCellar.getCellar());
@@ -80,15 +87,28 @@ onMount(() => {
 function deleteProducer(producer: string) {
 	console.log('deleteProducer called');
 	console.log(producer);
-	localStorage.removeItem(producer);
-	myWineCellar.update((current) => {
-		if (current.removeProducer(producer)) {
-			console.log('deleteProducer removed producer');
-		} else {
-			console.log('deleteProducer did not remove producer');
-		}
-		return current;
-	});
+
+	if ($useNewDataType) {
+		myWineCellarFlat.update((current) => {
+			if (current.removeProducer(producer)) {
+				console.log('deleteProducer removed producer');
+			} else {
+				console.log('deleteProducer did not remove producer');
+			}
+			return current;
+		});
+		$storeExample = JSON.stringify($myWineCellarFlat.getCellarFlat());
+	} else {
+		localStorage.removeItem(producer);
+		myWineCellar.update((current) => {
+			if (current.removeProducer(producer)) {
+				console.log('deleteProducer removed producer');
+			} else {
+				console.log('deleteProducer did not remove producer');
+			}
+			return current;
+		});
+	}
 	updateDDLs();
 	dispatch('wineUpdated', { detail: 'wineUpdated' });
 }
@@ -97,10 +117,10 @@ function handleWinesUpdated() {
 	// Update the local data or trigger a refresh
 	if (!debugMode) {
 		console.log('handleWinesUpdated (App.svelte) called loading from local storage');
-		$myWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
-		dispatch('wineUpdated', { detail: 'wineUpdated' });
-		updateDDLs();
+		//$myWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
 	}
+	dispatch('wineUpdated', { detail: 'wineUpdated' });
+	updateDDLs();
 }
 //todo make sure works with wineflat does this need to exist in layout and page?
 function updateDDLs() {
@@ -110,16 +130,43 @@ function updateDDLs() {
 		variety: [{ name: 'All Varieties', value: '' }],
 		vineyard: [{ name: 'All Vineyards', value: '' }]
 	};
-	if ($myWineCellar.getProducerCount() > 0) {
+	if (browser) {
+		cellarFlat = $myWineCellarFlat.getFilteredCellarFlat({
+			searchterm: searchTerm,
+			producer: selectedProducer,
+			variety: selectedVariety,
+			vineyard: selectedVineyard
+		});
+		console.log(cellarFlat);
+		producerList = cellarFlat.map((element) => element['Producer']);
+		sortedWines = producerList.reduce((acc, cur) => {
+			acc[cur] = cellarFlat.filter((wine) => wine.Producer === cur);
+			return acc;
+		}, {});
 		console.log('updateDDLs called  - adding searchParams');
+		$myWineCellarFlat.getProducerNames().forEach((element) => console.log(element.name));
+		addOptions('producer', $myWineCellarFlat.getProducerNames());
+		addOptions('variety', $myWineCellarFlat.getVarietyNames());
+		addOptions('vineyard', $myWineCellarFlat.getVineyardNames());
+		console.log('updateDDLs searchParams');
+		console.log(searchParams);
+		return;
+	}
+
+	if ($myWineCellar.getProducerCount() > 0 && !$useNewDataType) {
+		console.log(
+			'updateDDLs called  - adding searchParams producer count is ' +
+				$myWineCellar.getProducerCount()
+		);
 		$myWineCellar.getProducerNames().forEach((element) => console.log(element.name));
 		addOptions('producer', $myWineCellar.getProducerNames());
 		addOptions('variety', $myWineCellar.getVarietyNames());
 		addOptions('vineyard', $myWineCellar.getVineyardNames());
-		console.log('updateDDLs searchParams');
+		console.log('updateDDLs searchParams using old data');
 		console.log(searchParams);
 	}
 }
+
 //todo determine if needed on layout and page, this doesn't match the one in layout
 function addOptions(paramKey: string, newOptions: { name: string; value: string }[]) {
 	if (searchParams[paramKey]) {
@@ -180,7 +227,66 @@ function loadOwnedWinesFromLocalStorage(): Cellar {
 */
 //$ownedWinesString = JSON.stringify(ownedWines);
 
-$: updateDDLs();
+$: {
+	console.log('Reactive DDL update');
+	updateDDLs();
+}
+cellarFlat = $myWineCellarFlat.getCellarFlat();
+console.log('Reactive cellar in page.svelte updating from store');
+console.log(cellarFlat);
+console.log(
+	`search term: ${searchTerm} producer: ${selectedProducer} variety: ${selectedVariety} vineyard: ${selectedVineyard}`
+);
+
+$: if (browser) {
+	cellarFlat = $myWineCellarFlat.getFilteredCellarFlat({
+		searchterm: searchTerm,
+		producer: selectedProducer,
+		variety: selectedVariety,
+		vineyard: selectedVineyard
+	});
+	console.log(cellarFlat);
+	producerList = cellarFlat.map((element) => element['Producer']);
+	sortedWines = producerList.reduce((acc, cur) => {
+		acc[cur] = cellarFlat.filter((wine) => wine.Producer === cur);
+		return acc;
+	}, {});
+}
+
+$: {
+	console.log(`producerList current:`);
+	console.log(producerList);
+	console.log('sortedWines current:');
+	console.log(sortedWines);
+}
+
+function showWine(producer: string): boolean {
+	//console.log(`showWine called with wineFlat`);
+	//console.log(producer);
+	if (sortedWines[producer] && Object.keys(sortedWines[producer]).length > 0) {
+		//console.log(`showWine found wineFlat.Producer`);
+		//console.log(producer);
+		return true;
+	}
+	return false;
+}
+
+$: console.log(`show key count to debug ${Object.keys(sortedWines).length}`);
+
+$: {
+	console.log(`showThisWine current:`);
+	console.log(showThisWine);
+}
+
+$: if (browser) {
+	//console.log('turning producer list into producer bool map');
+	let tmpShowThisWine = {};
+	producerList.forEach((element) => {
+		tmpShowThisWine[element] = showWine(element);
+	});
+	showThisWine = tmpShowThisWine;
+	//console.log(showThisWine);
+}
 </script>
 
 <svelte:head>
@@ -220,34 +326,38 @@ $: updateDDLs();
 		<!--todo update for wineflat-->
 		<!--todo incorporate toggle for different sorts-->
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-			{#if Object.keys(cellar).length > 0}
-				{#each Object.keys(cellar) as producer (producer)}
-					<div class="mb-8 flex flex-col justify-items-start">
-						<h1 class="mb-4 text-2xl font-medium text-cyan-500">
-							{producer}
-						</h1>
-						{#each cellar[producer] as wine, i (wine)}
-							<WineComp
-								wine={wine}
-								producer={producer}
-								index={i}
-								on:wineUpdated={handleWinesUpdated}
-							/>
-						{/each}
-						<div
-							class="grid grid-cols-1 gap-1 divide-x overflow-hidden rounded-lg border bg-white rtl:flex-row-reverse dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800"
-						>
-							<AddSpecificWine producer={producer} on:wineUpdated={handleWinesUpdated} />
+			{#if Object.keys(sortedWines).length > 0}
+				{#each Object.keys(sortedWines) as producer (producer)}
+					{#if showThisWine[producer]}
+						<div class="mb-8 flex flex-col justify-items-start">
+							<h1 class="mb-4 text-2xl font-medium text-cyan-500">
+								{producer}
+							</h1>
+							{#each sortedWines[producer] as wine, index (wine)}
+								<WineComp
+									wine={WineCellarFlat.convertWineFlatToWine(wine)}
+									producer={producer}
+									{index}
+									wineFlat={wine}
+									on:wineUpdated={handleWinesUpdated}
+								/>
+							{/each}
 
-							<Button
-								type="button"
-								class="m-4 rounded-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-teal-300 dark:focus:ring-teal-800"
-								on:click={() => deleteProducer(producer)}
+							<div
+								class="grid grid-cols-1 gap-1 divide-x overflow-hidden rounded-lg border bg-white rtl:flex-row-reverse dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800"
 							>
-								Delete all wines from producer
-							</Button>
+								<AddSpecificWine producer={producer} on:wineUpdated={handleWinesUpdated} />
+
+								<Button
+									type="button"
+									class="m-4 rounded-lg bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gradient-to-br focus:outline-none focus:ring-4 focus:ring-teal-300 dark:focus:ring-teal-800"
+									on:click={() => deleteProducer(producer)}
+								>
+									Delete all wines from producer
+								</Button>
+							</div>
 						</div>
-					</div>
+					{/if}
 				{/each}
 			{:else}
 				<div class="flex items-center space-x-4">

@@ -1,0 +1,65 @@
+[
+	{
+		"Producer": "B.R. Cohn",
+		"Wine Name": "Cabernet Sauvignon",
+		"Vineyard Location": "North Coast",
+		"Variety": "Cabernet Sauvignon",
+		"Inventory": [
+			{ "Vintage": 2013, "Bin": "8-3", "Qty": 2, "Purchased": "09/23/2021" },
+			{ "Vintage": 2014, "Bin": "10-3", "Qty": 6, "Purchased": "" },
+			{ "Vintage": 2017, "Bin": "5-3", "Qty": 4, "Purchased": "" }
+		],
+		"Notes": ""
+	},
+	{
+		"Producer": "Barons De Rothschild (Lafite)",
+		"Wine Name": "Saint Emilion Reserve Speciale",
+		"Vineyard Location": "Saint Emilion",
+		"Variety": "Red Blend",
+		"Inventory": [{ "Vintage": 2012, "Bin": "5-1", "Qty": 1, "Purchased": "" }],
+		"Notes": ""
+	},
+	{
+		"Producer": "Becker Vineyards",
+		"Wine Name": "Barbera ",
+		"Vineyard Location": "Texas Hill Country",
+		"Variety": "Barbera",
+		"Inventory": [{ "Vintage": 2020, "Bin": "12-2", "Qty": 1, "Purchased": "10/24/2023" }],
+		"Notes": ""
+	},
+	{
+		"Producer": "Chateau de Lescours",
+		"Wine Name": "Saint Emilion Grand Cru",
+		"Vineyard Location": "Bordeaux",
+		"Variety": "Red Blend",
+		"Inventory": [
+			{ "Vintage": 2010, "Bin": "5-2", "Qty": 3, "Purchased": "" },
+			{ "Vintage": 2012, "Bin": "5-2", "Qty": 6, "Purchased": "11/24/2013" }
+		],
+		"Notes": ""
+	},
+	{
+		"Producer": "Chateau Ferran",
+		"Wine Name": "Bordeaux  ",
+		"Vineyard Location": "Bordeaux",
+		"Variety": "Red Blend",
+		"Inventory": [{ "Vintage": 2016, "Bin": "7-2", "Qty": 1, "Purchased": "" }],
+		"Notes": ""
+	},
+	{
+		"Producer": "Chateau Grand-Puy-Lacoste",
+		"Wine Name": "Pauillac",
+		"Vineyard Location": "Bordeaux",
+		"Variety": "Red Blend",
+		"Inventory": [{ "Vintage": 2014, "Bin": "5-1", "Qty": 2, "Purchased": "" }],
+		"Notes": ""
+	},
+	{
+		"Producer": "Chateau La Confession",
+		"Wine Name": "St-Emilion Grand Cru",
+		"Vineyard Location": "Bordeaux",
+		"Variety": "Red Blend",
+		"Inventory": [{ "Vintage": 2015, "Bin": "4-2", "Qty": 4, "Purchased": "" }],
+		"Notes": ""
+	}
+]
