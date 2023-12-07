@@ -1,8 +1,15 @@
 <script lang="ts">
+import { browser } from '$app/environment';
 import InventoryMgmt from '$lib/InventoryMgmt.svelte';
 import * as Card from '$lib/components/ui/card';
-import { myWineCellar } from '$lib/store';
-import type { Wine } from '$lib/types';
+import {
+	myWineCellar,
+	myWineCellarFlat,
+	ownedWinesString,
+	storeExample,
+	useNewDataType
+} from '$lib/store';
+import type { CellarFlat, Wine, WineFlat } from '$lib/types';
 import { Label } from 'flowbite-svelte';
 import { createEventDispatcher } from 'svelte';
 
@@ -17,73 +24,74 @@ export let wine: Wine = {
 	Notes: 'Excellent vintage'
 };
 
-export let wineFlat = {
-	Producer: '',
-	'Wine Name': '',
-	'Vineyard Location': '',
-	Variety: '',
-	Inventory: [
-		{
-			Vintage: 0,
-			Bin: '',
-			Qty: 0,
-			Purchased: ''
-		}
-	],
+export let wineFlat: WineFlat = {
+	Producer: 'Sciandri',
+	'Wine Name': 'Nello Coombsville',
+	'Vineyard Location': 'Napa Valley',
+	Variety: 'Red Blend',
+	Inventory: [{ Vintage: 2016, Bin: '14-2', Qty: 1, Purchased: '' }],
 	Notes: ''
 };
 export let index: number = 0;
-
+wineFlat =
+	$myWineCellarFlat.checkWineByNameVintageFlat(wine['Wine Name'], wine.Vintage) ?? wineFlat;
+//wineFlat = WineCellarFlat.convertWineToFlat(producer, wine);
 const dispatch = createEventDispatcher();
 
 let tempWines: Wine[] = [];
-$: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
+let tempWinesFlat: WineFlat[] = [];
+$: ownedWines = $myWineCellarFlat.getWinesByProducer(producer) || [];
+$: ownedWinesFlat = $myWineCellarFlat.getCellarFlat() || [];
 
 function handleWineUpdated() {
-	let storedValue = localStorage.getItem(producer) ?? '[]';
-	try {
-		tempWines = JSON.parse(storedValue);
-	} catch (error) {
-		console.error('Error parsing JSON from localStorage', error);
-		tempWines = [];
+	// Update the local data or trigger a refresh
+	let tmpCellar: CellarFlat = [];
+	if (browser) {
+		console.log('xxxxxloading cell flat from storage store');
+		tmpCellar = JSON.parse($storeExample) as CellarFlat;
+		$myWineCellarFlat.updateCellarFlat(tmpCellar);
 	}
-	console.log(`ZY Wine handleWineUpdated - tempWines: ${tempWines}`);
-	myWineCellar.update((current) => {
-		current.updateCellarByProducer(producer, tempWines);
-		return current;
-	});
-	tempWines = [];
-	dispatch('wineUpdated');
+	if ($useNewDataType) {
+		$ownedWinesString = JSON.stringify($myWineCellarFlat.getCellarFlat());
+		//updateDDLs();
+		return;
+	}
+	let tempCellar: CellarFlat = JSON.parse($storeExample) as CellarFlat;
+	console.log('handleWinesUpdated (App.svelte) called loading from local storage');
+	$myWineCellarFlat.updateCellarFlat(tempCellar);
+	$ownedWinesString = JSON.stringify(tempCellar);
+	//if (browser) $storeExample = JSON.stringify(tempCellar);
+	//updateDDLs();
 }
 function qtyIncrement() {
 	console.log(`ZY Wine qtyIncrement - producer: ${producer} - wine:`);
 	console.log(wine);
-	console.log(`ZY Wine qtyIncrement - wine.Qty: ${wine.Qty}`);
-
-	wine.Qty = wine.Qty + 1;
-	console.log(`ZY Wine qtyIncrement - wine.Qty: ${wine.Qty}`);
+	console.log(`ZY Wine qtyIncrement - wine.Qty: ${wineFlat.Inventory[index].Qty}`);
+	let qty = wineFlat.Inventory[index].Qty;
+	qty = qty + 1;
+	console.log(`ZY Wine qtyIncrement - wine.Qty: ${qty}`);
 	let storedValue = localStorage.getItem(producer) ?? '[]';
 	try {
-		tempWines = JSON.parse(storedValue);
+		tempWinesFlat = JSON.parse(storedValue) as WineFlat[];
 		console.log(`ZY Wine qtyIncrement - pulled producer's wines from local storage:`);
-		console.log(tempWines);
-		myWineCellar.update((current) => {
-			current.updateCellarByProducer(producer, tempWines);
+		console.log(tempWinesFlat);
+		myWineCellarFlat.update((current) => {
+			current.updateCellarFlat(tempWinesFlat);
 			return current;
 		});
 		console.log('Updated myWineCellar with tempWines');
-		console.log($myWineCellar.getWinesByProducer(producer));
+		console.log(JSON.stringify($myWineCellarFlat.getCellarFlat(), null, 2));
 		myWineCellar.update((current) => {
 			current.updateWine(producer, wine, index);
 			return current;
 		});
 		console.log(`Updated myWineCellar with wine
 				${wine['Wine Name']}
-				${wine.Qty}`);
+				${qty}`);
 		console.log('New myWineCellar wine entry:');
 		console.log($myWineCellar.getWinesByProducerWineName(producer, wine['Wine Name']));
 		console.log('updating local storage');
-		tempWines = $myWineCellar.getWinesByProducer(producer);
+		tempWines = $myWineCellar.getWinesByProducer(producer) ?? [];
 		let tempWinesString = JSON.stringify(tempWines);
 		localStorage.setItem(producer, tempWinesString);
 		console.log('local storage updated');
@@ -123,7 +131,7 @@ function qtyDecrement() {
 			console.log('New myWineCellar wine entry:');
 			console.log($myWineCellar.getWinesByProducerWineName(producer, wine['Wine Name']));
 			console.log('updating local storage');
-			tempWines = $myWineCellar.getWinesByProducer(producer);
+			tempWines = $myWineCellar.getWinesByProducer(producer) ?? [];
 			let tempWinesString = JSON.stringify(tempWines);
 			localStorage.setItem(producer, tempWinesString);
 			console.log('local storage updated');
@@ -248,4 +256,10 @@ function deleteWine() {
 		</div>
 	</section>
 </div>
-<InventoryMgmt wine={wine} producer={producer} index={index} {wineFlat} on:wineUpdated={handleWineUpdated} />
+<InventoryMgmt
+	wine={wine}
+	producer={producer}
+	index={index}
+	wineFlat={wineFlat}
+	on:wineUpdated={handleWineUpdated}
+/>

@@ -1,9 +1,9 @@
 <script lang="ts">
 import { browser } from '$app/environment';
+import { Skeleton } from '$lib/components/ui/skeleton';
 import AddSpecificWine from '$lib/AddSpecificWine.svelte';
 import WineCellarFlat from '$lib/WineCellarFlat';
 import WineComp from '$lib/WineComp.svelte';
-import { Skeleton } from '$lib/components/ui/skeleton';
 import { myWineCellar, myWineCellarFlat, storeExample, useNewDataType } from '$lib/store.js';
 import type { Cellar, CellarFlat, Wine, WineFlat } from '$lib/types';
 import { Button, CloseButton, Input, Select } from 'flowbite-svelte';
@@ -55,8 +55,8 @@ function clearSearch(setter: (value: string) => void): void {
 	setter('');
 }
 
-function isIterable(obj) {
-	return obj != null && typeof obj[Symbol.iterator] === 'function';
+function isIterable(obj: Function) {
+	return obj != null && typeof obj !== 'undefined';
 }
 
 // todo this shouldn't need to happen twice skip myWinceCellar.updateCellar
@@ -131,18 +131,21 @@ function updateDDLs() {
 		vineyard: [{ name: 'All Vineyards', value: '' }]
 	};
 	if (browser) {
-		cellarFlat = $myWineCellarFlat.getFilteredCellarFlat({
+		$myWineCellarFlat.updateSearchParams({
 			searchterm: searchTerm,
 			producer: selectedProducer,
 			variety: selectedVariety,
 			vineyard: selectedVineyard
 		});
+		cellarFlat = $myWineCellarFlat.getFilteredCellarFlat();
+
 		console.log(cellarFlat);
 		producerList = cellarFlat.map((element) => element['Producer']);
-		sortedWines = producerList.reduce((acc, cur) => {
+
+		/* sortedWines = producerList.reduce((acc , cur) => {
 			acc[cur] = cellarFlat.filter((wine) => wine.Producer === cur);
 			return acc;
-		}, {});
+		}, {}); */
 		console.log('updateDDLs called  - adding searchParams');
 		$myWineCellarFlat.getProducerNames().forEach((element) => console.log(element.name));
 		addOptions('producer', $myWineCellarFlat.getProducerNames());
@@ -239,15 +242,16 @@ console.log(
 );
 
 $: if (browser) {
-	cellarFlat = $myWineCellarFlat.getFilteredCellarFlat({
+	$myWineCellarFlat.updateSearchParams({
 		searchterm: searchTerm,
 		producer: selectedProducer,
 		variety: selectedVariety,
 		vineyard: selectedVineyard
 	});
+	cellarFlat = $myWineCellarFlat.getFilteredCellarFlat();
 	console.log(cellarFlat);
 	producerList = cellarFlat.map((element) => element['Producer']);
-	sortedWines = producerList.reduce((acc, cur) => {
+	sortedWines = producerList.reduce((acc: { [Producer: string]: WineFlat[] }, cur) => {
 		acc[cur] = cellarFlat.filter((wine) => wine.Producer === cur);
 		return acc;
 	}, {});
@@ -280,7 +284,7 @@ $: {
 
 $: if (browser) {
 	//console.log('turning producer list into producer bool map');
-	let tmpShowThisWine = {};
+	let tmpShowThisWine: { [Producer: string]: boolean } = {};
 	producerList.forEach((element) => {
 		tmpShowThisWine[element] = showWine(element);
 	});
@@ -337,7 +341,7 @@ $: if (browser) {
 								<WineComp
 									wine={WineCellarFlat.convertWineFlatToWine(wine)}
 									producer={producer}
-									{index}
+									index={index}
 									wineFlat={wine}
 									on:wineUpdated={handleWinesUpdated}
 								/>

@@ -80,7 +80,7 @@ function qtyIncrement() {
 	dispatch('wineUpdated');
 }
 //todo update to use wineflat
-function qtyDecrement() {
+/* function qtyDecrement() {
 	console.log(`ZZ Wine qtyDecrement - producer: ${producer} - wine:`);
 	console.log(wine);
 	console.log(`ZZ Wine qtyDecrement - wine.Qty: ${wine.Qty}`);
@@ -108,7 +108,7 @@ function qtyDecrement() {
 			console.log('New myWineCellar wine entry:');
 			console.log($myWineCellar.getWinesByProducerWineName(producer, wine['Wine Name']));
 			console.log('updating local storage');
-			tempWines = $myWineCellar.getWinesByProducer(producer);
+			tempWines = $myWineCellar.getWinesByProducer(producer) ? $myWineCellar: [];
 			let tempWinesString = JSON.stringify(tempWines);
 			localStorage.setItem(producer, tempWinesString);
 			console.log('local storage updated');
@@ -122,7 +122,7 @@ function qtyDecrement() {
 	} else {
 		console.log('Error wine cannot go below 0');
 	}
-}
+} */
 //todo update to use wineflat
 function deleteWine() {
 	console.log(`ZZ Wine deleteWine - wine: ${wine}`);

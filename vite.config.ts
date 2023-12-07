@@ -4,7 +4,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	plugins: [sveltekit()],
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}', 'tests/**/*.{test,spec}.{js,ts,html,svelte}'],
+		include: [
+			'./src/**/*.{test,spec}.{js,ts,svelte}',
+			'./tests/**.{test,spec}.{js,ts,html,svelte}'
+		],
 		environment: 'jsdom'
 	}
 });

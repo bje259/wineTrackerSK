@@ -1,4 +1,4 @@
-// @ts-ignore
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { WineCellar } from '$lib/WineCellar';
 import { myWineCellar } from '$lib/store';
 import type { Cellar, Wine } from '$lib/types';
@@ -77,6 +77,7 @@ const unsubscribe = myWineCellar.subscribe((value) => {
 	ownedWineCellar = value;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let dispatch = (type: string, detail?: any) => {
 	document.dispatchEvent(
 		new CustomEvent(type, {
@@ -160,38 +161,34 @@ function updateDDLs() {
 	console.log(searchParams);
 }
 
-
-
 function clearText(f: (v: string) => void) {
-    f('');
+	f('');
 }
 
 describe('WineCellar', () => {
-    beforeAll(() => {
-        console.log('beforeAll called');
-        ownedWineCellar = new WineCellar();
-        ownedWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
-        updateDDLs();
-    });
+	beforeAll(() => {
+		console.log('beforeAll called');
+		ownedWineCellar = new WineCellar();
+		ownedWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
+		updateDDLs();
+	});
 
-    beforeEach(() => {
-        console.log('beforeEach called');
-        ownedWineCellar = new WineCellar();
-        ownedWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
-        updateDDLs();
-    });
+	beforeEach(() => {
+		console.log('beforeEach called');
+		ownedWineCellar = new WineCellar();
+		ownedWineCellar.updateCellar(loadOwnedWinesFromLocalStorage());
+		updateDDLs();
+	});
 
-    test('WineCellar should be defined', () => {
-        expect(ownedWineCellar).toBeDefined();
-    });
+	test('WineCellar should be defined', () => {
+		expect(ownedWineCellar).toBeDefined();
+	});
 
-    test('WineCellar should have a producers array', () => {
-        expect(ownedWineCellar.getProducerNames()).toBeDefined();
-    });
+	test('WineCellar should have a producers array', () => {
+		expect(ownedWineCellar.getProducerNames()).toBeDefined();
+	});
 
-    test('myWineCellar should have a wines array', () => {
-        expect(ownedWineCellar.getAllWinesFlat()).toBeDefined();
-    });
-})
-
-
+	test('myWineCellar should have a wines array', () => {
+		expect(ownedWineCellar.getAllWinesFlat()).toBeDefined();
+	});
+});

@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { WineCellar } from './WineCellar';
 import type { Cellar, CellarFlat, InvItem, SearchParams, Wine, WineFlat } from './types';
+//import { testWineFlat } from './store';
 
 /**
  * @description Checks if an object is iterable.
  * @param obj
  * @returns boolean
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isIterable(obj: any): boolean {
 	return obj != null && typeof obj[Symbol.iterator] === 'function';
 }
@@ -24,6 +25,9 @@ export class WineCellarFlat extends WineCellar {
 	cellarFlat: CellarFlat;
 	filteredCellarFlat: CellarFlat;
 	currentSearchParams: SearchParams;
+	/* tstWineFlatStore: Writable<string>;
+	unsubscribe: Unsubscriber;
+	tstWineFlat: string; */
 
 	/**
 	 * The WineCellar class represents a collection of wines.
@@ -43,25 +47,39 @@ export class WineCellarFlat extends WineCellar {
 	 * 	Notes: "Excellent vintage"
 	 * });
 	 */
-	constructor(cell?: Cellar, cellFlat?: CellarFlat) {
-		super(cell ? cell : cellFlat ? WineCellarFlat.convertToCellar(cellFlat) : {});
-		this.cellarFlat = cellFlat ? cellFlat : cell ? WineCellarFlat.convertToFlat(cell) : [];
+	constructor(cellFlat?: CellarFlat) {
+		if (cellFlat) {
+			super(WineCellarFlat.convertToCellar(cellFlat));
+		} else {
+			super();
+		}
+		this.cellarFlat = cellFlat || [];
 		this.filteredCellarFlat = this.cellarFlat;
 		this.currentSearchParams = {
 			Producer: { isActive: false, value: '' },
 			['Vineyard Location']: { isActive: false, value: '' },
 			Variety: { isActive: false, value: '' },
-			SearchTerm: { isActive: false, value: '' }
+			SearchTerm: { isActive: false, value: '' },
+			Vintage: { isActive: false, value: '' },
+			Qty: { isActive: false, value: '' },
+			Bin: { isActive: false, value: '' },
+			Purchased: { isActive: false, value: '' },
+			Notes: { isActive: false, value: '' }
 		};
-
+		/* this.tstWineFlatStore = testWineFlat;
+		this.tstWineFlat = '[]';
+		this.unsubscribe = this.tstWineFlatStore.subscribe((value) => {
+			this.tstWineFlat = value;
+		}); */
 	}
-
 
 	/**
 	 * Convert cellar to cellarFlat
 	 */
 	public static convertToFlat(cellar: Cellar): CellarFlat {
 		let cellarFlat: CellarFlat = [];
+		console.log('Checking cellar before conversion');
+		console.log(cellar);
 		for (const producer in cellar) {
 			for (const wine of cellar[producer]) {
 				if (
@@ -333,7 +351,7 @@ export class WineCellarFlat extends WineCellar {
 				this.cellarFlat = existingCellarFlat;
 			}
 		}
-		//todo decide if I want to keep cellar in sync with cellarFlat
+
 		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
 	}
 
@@ -345,8 +363,27 @@ export class WineCellarFlat extends WineCellar {
 	 * @returns True if the wine was successfully removed, false otherwise.
 	 */
 	removeWine(producer: string, wineName: string, wine?: Wine): boolean {
+		console.log('Cellar before remove wine');
+		console.log(this.cellar);
 		if (this.cellarFlat) {
 			const currentCellarFlat = this.cellarFlat;
+			if (!wine) {
+				const index = this.cellarFlat.findIndex(
+					(w) => w.Producer === producer && w['Wine Name'] === wineName
+				);
+				if (index !== -1) {
+					currentCellarFlat.splice(index, 1);
+					this.cellarFlat = currentCellarFlat;
+					this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
+					console.log('Cellar after remove wine');
+					console.log(this.cellar);
+					return true;
+				}
+				this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
+				console.log('Cellar after remove wine');
+				console.log(this.cellar);
+				return false;
+			}
 			const index = this.cellarFlat.findIndex(
 				(w) =>
 					w.Producer === producer &&
@@ -354,6 +391,32 @@ export class WineCellarFlat extends WineCellar {
 					wine?.Variety &&
 					w['Vineyard Location'] === wine['Vineyard Location'] &&
 					w.Variety === wine.Variety
+			);
+
+			if (index !== -1) {
+				currentCellarFlat.splice(index, 1);
+				this.cellarFlat = currentCellarFlat;
+				this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
+				console.log('Cellar after remove wine');
+				console.log(this.cellar);
+				return true;
+			}
+		}
+		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
+		console.log('Cellar after remove wine');
+		console.log(this.cellar);
+		return false;
+	}
+
+	removeWineFlat(wineFlat: WineFlat): boolean {
+		if (this.cellarFlat) {
+			const currentCellarFlat = this.cellarFlat;
+			const index = this.cellarFlat.findIndex(
+				(w) =>
+					w.Producer === wineFlat.Producer &&
+					w['Wine Name'] === wineFlat['Wine Name'] &&
+					w['Vineyard Location'] === wineFlat['Vineyard Location'] &&
+					w.Variety === wineFlat.Variety
 			);
 
 			if (index !== -1) {
@@ -384,6 +447,7 @@ export class WineCellarFlat extends WineCellar {
 			}
 		}
 		this.cellarFlat = tempCellarFlat;
+		this.cellar = WineCellarFlat.convertToCellar(this.cellarFlat);
 		return foundProducer;
 	}
 
@@ -755,23 +819,42 @@ export class WineCellarFlat extends WineCellar {
 			Variety: { isActive: false, value: '' },
 			SearchTerm: { isActive: false, value: '' }
 		};
-
-		
-		let invKeys: (keyof InvItem)[] = ['Vintage', 'Bin', 'Qty', 'Purchased'];
-		let searchToken = '';
-		let keys: (keyof SearchParams)[] = [];
-		for (const key in this.currentSearchParams) {
-		if (key === 'SearchTerm') {
-			continue;
+		if (filters.searchterm) {
+			this.currentSearchParams.SearchTerm = { isActive: true, value: filters.searchterm };
 		}
-		keys.push(key as keyof SearchParams);
+		if (filters.producer) {
+			this.currentSearchParams.Producer = { isActive: true, value: filters.producer };
 		}
-			}
-			
-		
-	
-	
+		if (filters.variety) {
+			this.currentSearchParams.Variety = { isActive: true, value: filters.variety };
+		}
+		if (filters.vineyard) {
+			this.currentSearchParams['Vineyard Location'] = {
+				isActive: true,
+				value: filters.vineyard
+			};
+		}
 
+		this.filteredCellarFlat = this.cellarFlat;
+		console.log('filtered cellar flat: start');
+		console.log(this.filteredCellarFlat);
+		this.updateFilteredCellar('SearchTerm');
+		console.log('after filter done ');
+		console.log(this.filteredCellarFlat);
+		/* this.updateFilteredCellar('Producer');
+		console.log('after producer ');
+		console.log(this.filteredCellarFlat);
+		this.updateFilteredCellar('Variety');
+		console.log('after variety ');
+		console.log(this.filteredCellarFlat);
+		this.updateFilteredCellar('Vineyard Location');
+		console.log('after vineyard ');
+		console.log(this.filteredCellarFlat);
+		this.updateFilteredCellar('Inventory');
+		console.log('after inventory ');
+		console.log(this.filteredCellarFlat);
+		console.log('filtered cellar flat: end'); */
+	}
 
 	/**
 	 * Update filtered celler data based on current search parameters.
@@ -793,14 +876,47 @@ export class WineCellarFlat extends WineCellar {
 			'Producer'
 		];
 		let invKeys: (keyof InvItem)[] = ['Vintage', 'Bin', 'Qty', 'Purchased'];
+		let debug = false;
+		let currentCellarFlat = this.filteredCellarFlat;
 
-		let currentCellarFlat = this.cellarFlat;
+		//SearchTerm
 		if (this.currentSearchParams.SearchTerm?.isActive) {
+			console.log('search term is active');
+			console.log(this.currentSearchParams.SearchTerm);
+			console.log('current cellar flat');
+			console.log(currentCellarFlat);
+
+			const searchTerm =
+				this.currentSearchParams.SearchTerm?.value?.toString()?.toLowerCase() || '';
+
 			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
-				if (searchToken === 'Inventory') return true;
+				return keys.some((key) => {
+					//Inventory
+					if (key === 'Inventory') {
+						return wineFlat.Inventory.some((invItem) =>
+							invKeys.some((iKey) => invItem[iKey]?.toString().toLowerCase().includes(searchTerm))
+						);
+						//non-Inventory
+					} else if (typeof wineFlat[key] === 'string') {
+						return wineFlat[key]?.toLowerCase().includes(searchTerm);
+					}
+					return false;
+				});
+			});
+
+			/* currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
 				return keys.some((key) => {
 					if (key === 'Inventory') {
-						return true;
+						return wineFlat.Inventory.some((invItem) => {
+							return invKeys.some((iKey: keyof InvItem) => {
+								return invItem[iKey]
+									?.toString()
+									?.toLowerCase()
+									?.includes(
+										this?.currentSearchParams?.SearchTerm?.value?.toString()?.toLowerCase()
+									? this?.currentSearchParams?.SearchTerm?.value?.toString()?.toLowerCase(): '');
+							});
+						});
 					} else {
 						let searchTermValue = this.currentSearchParams.SearchTerm?.value;
 						if (typeof searchTermValue === 'string') {
@@ -809,43 +925,88 @@ export class WineCellarFlat extends WineCellar {
 						return false;
 					}
 				});
-			});
-			//Inventory
-			if(currentCellarFlat&&(searchToken==='Inventory'||searchToken==='SearchTerm')){
+			}); */
+			/* //Inventory
+			if (currentCellarFlat && (searchToken === 'Inventory' || searchToken === 'SearchTerm')) {
 				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
 					return wineFlat.Inventory.some((invItem) => {
-						return invKeys.some((key) => {
-							return invItem[key]?.toString().toLowerCase().includes(searchToken.toLowerCase());
+						return invKeys.some((iKey: keyof InvItem) => {
+							return invItem[iKey]?.toString().toLowerCase().includes(searchToken.toLowerCase());
 						});
 					});
 				});
+			} */
+		}
+		console.log('filtered cellar flat: after search term');
+		console.log(currentCellarFlat);
+
+		if (!debug) {
+			//Producer
+			if (
+				this.currentSearchParams.Producer ? this.currentSearchParams['Producer'].isActive : false
+			) {
+				console.log('search Producer is active');
+				console.log(this.currentSearchParams.Producer);
+				console.log('current cellar flat');
+				console.log(currentCellarFlat);
+				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+					return wineFlat.Producer.toLowerCase().includes(
+						this.currentSearchParams?.Producer?.value?.toString()?.toLowerCase()
+							? this.currentSearchParams?.Producer?.value?.toString()?.toLowerCase()
+							: ''
+					);
+				});
+			}
+
+			console.log('filtered cellar flat: after producer');
+			console.log(currentCellarFlat);
+
+			//Variety
+			if (this.currentSearchParams.Variety ? this.currentSearchParams.Variety['isActive'] : true) {
+				console.log('search Variety is active');
+				console.log(this.currentSearchParams.Variety);
+				console.log('current cellar flat');
+				console.log(currentCellarFlat);
+				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+					return wineFlat.Variety?.toLowerCase().includes(
+						this.currentSearchParams?.Variety?.value?.toString()?.toLowerCase()
+							? this.currentSearchParams?.Variety?.value?.toString()?.toLowerCase()
+							: ''
+					);
+				});
+			}
+
+			console.log('filtered cellar flat: after variety');
+			console.log(currentCellarFlat);
+
+			//Vineyard Location
+			if (
+				this.currentSearchParams['Vineyard Location']
+					? this.currentSearchParams['Vineyard Location']['isActive']
+					: true
+			) {
+				console.log('search Vineyard Location is active');
+				console.log(this.currentSearchParams['Vineyard Location']);
+				console.log('current cellar flat');
+				console.log(currentCellarFlat);
+				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+					return wineFlat['Vineyard Location']
+						?.toLowerCase()
+						.includes(
+							this.currentSearchParams?.['Vineyard Location']?.value?.toString()?.toLowerCase()
+								? this.currentSearchParams?.['Vineyard Location']?.value?.toString()?.toLowerCase()
+								: ''
+						);
+				});
 			}
 		}
-		//Producer
-		if (this.currentSearchParams.Producer ? this.currentSearchParams["Producer"] : true) {
-			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
-				return wineFlat.Producer?.toLowerCase().includes(searchToken.toLowerCase());
-			});
-		}
-		//Variety
-		if (this.currentSearchParams.Variety ? this.currentSearchParams.Variety["isActive"] : true) {
-			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
-				return wineFlat.Variety?.toLowerCase().includes(searchToken.toLowerCase());
-			});
-		}
-		//Vineyard Location
-		if (
-			this.currentSearchParams['Vineyard Location']
-				? this.currentSearchParams['Vineyard Location']["isActive"]
-				: true
-		) {
-			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
-				return wineFlat['Vineyard Location']?.toLowerCase().includes(searchToken.toLowerCase());
-			});
-		}
+
+		console.log('filtered cellar flat: after vineyard');
+		console.log(currentCellarFlat);
+
 		this.filteredCellarFlat = currentCellarFlat;
-		console.log('filtered cellar flat: ');
-		console.log(this.filteredCellarFlat);
+		/* console.log('filtered cellar flat: ');
+		console.log(this.filteredCellarFlat); */
 	}
 
 	getFilteredCellarFlat(): WineFlat[] {
@@ -859,19 +1020,130 @@ export class WineCellarFlat extends WineCellar {
 	 * @returns The wine object if found, otherwise undefined.
 	 */
 	checkWineByNameVintage(wineName: string, vintage: number): Wine | undefined {
-		/*return WineCellarFlat.convertWineFlatToWine(
-			this.cellarFlat.find((wine) => {
-				return (
-					wine['Wine Name'] === wineName &&
-					wine.Inventory.some((invItem) => {
-						return invItem.Vintage === vintage;
-					})
-				);
-			})
-		);*/
-		//todo
-		let tempWine: any = {};
-		return tempWine;
+		let currentCellarFlat = this.cellarFlat;
+		let currentSearchParams: SearchParams = {
+			Producer: { isActive: false, value: '' },
+			['Wine Name']: { isActive: true, value: wineName as string },
+			['Vineyard Location']: { isActive: false, value: '' },
+			Variety: { isActive: false, value: '' },
+			SearchTerm: { isActive: false, value: '' },
+			Vintage: { isActive: true, value: vintage as number },
+			Qty: { isActive: false, value: '' },
+			Bin: { isActive: false, value: '' },
+			Purchased: { isActive: false, value: '' },
+			Notes: { isActive: false, value: '' }
+		};
+
+		//Vintage
+		if (currentSearchParams.Vintage?.isActive) {
+			console.log('search vintage is active');
+			console.log(currentSearchParams.Vintage);
+			console.log('current cellar flat');
+			console.log(JSON.stringify(currentCellarFlat, null, 2));
+
+			const searchValue = currentSearchParams.Vintage?.value as number;
+
+			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+				return wineFlat.Inventory.some((invItem) => invItem.Vintage === searchValue);
+			});
+			console.log('filtered cellar flat: after vintage');
+			console.log(JSON.stringify(currentCellarFlat, null, 2));
+
+			//Wine Name
+			if (currentSearchParams['Wine Name'] ? currentSearchParams['Wine Name'].isActive : false) {
+				const searchTerm = currentSearchParams['Wine Name']?.value?.toString()?.toLowerCase() || '';
+				console.log('search Wine Name is active');
+				console.log(currentSearchParams['Wine Name']);
+				console.log('current cellar flat');
+				console.log(currentCellarFlat);
+				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+					return wineFlat['Wine Name'].toLowerCase().includes(searchTerm);
+				});
+			}
+
+			console.log('filtered cellar flat: after wine name');
+			console.log(JSON.stringify(currentCellarFlat, null, 2));
+
+			/* console.log('filtered cellar flat: ');
+		console.log(filteredCellarFlat); */
+
+			return currentCellarFlat[0]
+				? WineCellarFlat.convertWineFlatToWine(currentCellarFlat[0])
+				: undefined;
+		}
+	}
+
+	checkWineByNameVintageFlat(wineName: string, vintage: number): WineFlat | undefined {
+		let currentCellarFlat = this.cellarFlat;
+		let currentSearchParams: SearchParams = {
+			Producer: { isActive: false, value: '' },
+			['Wine Name']: { isActive: true, value: wineName as string },
+			['Vineyard Location']: { isActive: false, value: '' },
+			Variety: { isActive: false, value: '' },
+			SearchTerm: { isActive: false, value: '' },
+			Vintage: { isActive: true, value: vintage as number },
+			Qty: { isActive: false, value: '' },
+			Bin: { isActive: false, value: '' },
+			Purchased: { isActive: false, value: '' },
+			Notes: { isActive: false, value: '' }
+		};
+
+		//Vintage
+		if (currentSearchParams.Vintage?.isActive) {
+			/* console.log('search vintage is active');
+			console.log(currentSearchParams.Vintage);
+			console.log('current cellar flat');
+			console.log(JSON.stringify(currentCellarFlat, null, 2)); */
+
+			const searchValue = currentSearchParams.Vintage?.value as number;
+
+			currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+				return wineFlat.Inventory.some((invItem) => invItem.Vintage === searchValue);
+			});
+			/* console.log('filtered cellar flat: after vintage');
+			console.log(JSON.stringify(currentCellarFlat, null, 2)); */
+
+			//Wine Name
+			if (currentSearchParams['Wine Name'] ? currentSearchParams['Wine Name'].isActive : false) {
+				const searchTerm = currentSearchParams['Wine Name']?.value?.toString()?.toLowerCase() || '';
+				/* console.log('search Wine Name is active');
+				console.log(currentSearchParams['Wine Name']);
+				console.log('current cellar flat');
+				console.log(currentCellarFlat); */
+				currentCellarFlat = currentCellarFlat.filter((wineFlat) => {
+					return wineFlat['Wine Name'].toLowerCase().includes(searchTerm);
+				});
+			}
+
+			console.log('filtered cellar flat: after wine name');
+			console.log(JSON.stringify(currentCellarFlat, null, 2));
+
+			/* console.log('filtered cellar flat: ');
+		console.log(filteredCellarFlat); */
+
+			return currentCellarFlat[0];
+		}
+	}
+
+	/**
+	 * Find index of a specific wineFlat in the cellarFlat array and the index of the inventory item in the wineFlat.Inventory array.
+	 */
+	findWineFlatIndex(wineFlat: WineFlat): { wineIndex: number; invIndex: number } {
+		const wineIndex = this.cellarFlat.findIndex(
+			(w) =>
+				w.Producer === wineFlat.Producer &&
+				w['Wine Name'] === wineFlat['Wine Name'] &&
+				w['Vineyard Location'] === wineFlat['Vineyard Location'] &&
+				w.Variety === wineFlat.Variety
+		);
+		const invIndex = this.cellarFlat[wineIndex].Inventory.findIndex(
+			(invItem) =>
+				invItem.Vintage === wineFlat.Inventory[0].Vintage &&
+				invItem.Bin === wineFlat.Inventory[0].Bin &&
+				invItem.Qty === wineFlat.Inventory[0].Qty &&
+				invItem.Purchased === wineFlat.Inventory[0].Purchased
+		);
+		return { wineIndex, invIndex };
 	}
 
 	/**
@@ -910,8 +1182,6 @@ export class WineCellarFlat extends WineCellar {
 		}
 		return false;
 	}
-
-	
 
 	/**
 	 * Updates this.cellar for a specified producer with a wine array provided as a parameter.
@@ -1011,6 +1281,44 @@ export class WineCellarFlat extends WineCellar {
 	 */
 	getProducerCount(): number {
 		return this.getProducerNames().length;
+	}
+
+	/**
+	 * Increases adjust the quantity of a wine by the specified amount based on wine name and vintage.
+	 */
+	increaseWineQty(wineName: string, vintage: number, qty: number): boolean {
+		let wineFlat: WineFlat | undefined = undefined;
+		let indices = { wineIndex: -1, invIndex: -1 };
+		let currentWineFlat: WineFlat;
+		try {
+			wineFlat = this.checkWineByNameVintageFlat(wineName, vintage);
+			console.log('qty chg: wine flat');
+			console.log(wineFlat);
+
+			if (wineFlat === undefined) {
+				//throw new Error('wine not found');
+			}
+			indices = wineFlat ? this.findWineFlatIndex(wineFlat) : { wineIndex: 0, invIndex: -0 };
+		} catch (error) {
+			console.error(error);
+		}
+		if (wineFlat) {
+			wineFlat.Inventory[indices.invIndex].Qty += qty;
+			//this.updateWine(wine.Producer, wine);
+
+			if (indices.wineIndex !== -1 && indices.invIndex !== -1) {
+				//this.cellarFlat[indices.wineIndex].Inventory[indices.invIndex].Qty += qty;
+				this.updateCellarFlat(this.cellarFlat);
+				/* this.tstWineFlat = JSON.stringify(wineFlat);
+				this.tstWineFlatStore.update((current: string) => {
+					current = this.tstWineFlat;
+					return current;
+				}); */
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	// Additional utility methods can be added as needed

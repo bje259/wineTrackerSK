@@ -1,11 +1,10 @@
 <script lang="ts">
-import WineCellarFlat from '$lib/WineCellarFlat';
 import * as Card from '$lib/components/ui/card';
-import { myWineCellarFlat, storeExample } from '$lib/store';
-import type { CellarFlat, InvItem, Wine, WineFlat } from '$lib/types';
+import { myWineCellarFlat } from '$lib/store';
+import type { InvItem, Wine, WineFlat } from '$lib/types';
 import { Label } from 'flowbite-svelte';
 import { createEventDispatcher, onMount } from 'svelte';
-
+import { localStorageStore } from '@skeletonlabs/skeleton';
 export let producer: string = '';
 export let wine: Wine = {} as Wine;
 export let index: number;
@@ -26,11 +25,12 @@ export let wineFlat: WineFlat;
 	Notes: ''
 };*/
 
-let invItem: InvItem[] = [] as InvItem[];
+let invItem = {} as InvItem;
 
 const dispatch = createEventDispatcher();
 //todo update to use wineflat
 let tempWines: Wine[] = [];
+let tempWinesFlat: WineFlat[] = [];
 //$: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
 
 //todo update to use wineflat
@@ -52,20 +52,25 @@ dispatch('wineUpdated');
 /* } */
 
 onMount(() => {
-	invItem = [
-		{
-			Vintage: wineFlat.Inventory[index].Vintage,
-			Bin: wineFlat.Inventory[index].Bin,
-			Qty: wineFlat.Inventory[index].Qty,
-			Purchased: wineFlat.Inventory[index].Purchased
-		}
-	];
-let vint = 0;
-	console.log('Zyyyyyyyoriginl mounted InvMgmt wineFlat:',wineFlat);
+	invItem = wineFlat.Inventory[index] ?? {
+		Vintage: wineFlat.Inventory[index].Vintage,
+		Bin: wineFlat.Inventory[index].Bin,
+		Qty: wineFlat.Inventory[index].Qty,
+		Purchased: wineFlat.Inventory[index].Purchased
+	};
+	let vint = 0;
+	console.log('Zyyyyyyyoriginl mounted InvMgmt wineFlat:', wineFlat);
 	//console.log(wineFlat);
-	console.log('Zyyyyindex receivd?',index);
+	console.log('Zyyyyindex receivd?', index);
 	//console.log(index);
-	const tmpWine: Wine | undefined = $myWineCellarFlat.checkWineByNameVintage(wine['Wine Name'], vint as number);
+	const tmpWine: Wine | undefined = $myWineCellarFlat.checkWineByNameVintage(
+		wine['Wine Name'],
+		vint as number
+	);
+	const tmpWineFlat: WineFlat | undefined = $myWineCellarFlat.checkWineByNameVintageFlat(
+		wineFlat['Wine Name'],
+		vint as number
+	);
 	producer = 'Chateau Margaux';
 	wine = {
 		'Wine Name': 'Margaux 2015',
@@ -77,19 +82,30 @@ let vint = 0;
 		Purchased: '2020-01-01',
 		Notes: 'Excellent vintage'
 	};
-	invItem = [
+	/* invItem = [
 		{
 			Vintage: 2015,
 			Bin: 'A1',
 			Qty: 10,
 			Purchased: '2020-01-01'
 		}
-	];
+	]; */
 });
 
+$: {
+	console.log('zyyyyyyxyxy reactive inv mgmt check');
+	console.log(JSON.stringify(wineFlat), null, 2);
+}
+
 //todo update to use wineflat
-function qtyIncrement(e: MouseEvent) {
-	console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`,producer, wineFlat);
+function qtyIncrementInv(e: MouseEvent) {
+	console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`);
+	console.log(JSON.stringify(wineFlat, null, 2));
+
+	$myWineCellarFlat.increaseWineQty(wineFlat['Wine Name'], wineFlat.Inventory[index].Vintage, 1);
+	dispatch('wineUpdated');
+
+	/* console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`,producer, wineFlat);
 	//console.log(wineFlat);
 	console.log(`Zyyyyyyyy Wine qtyIncrement - wineFlat.Qty: for index`,index,invItem[0].Qty);
 
@@ -123,13 +139,15 @@ function qtyIncrement(e: MouseEvent) {
 		console.error('Error parsing JSON from localStorage', error);
 		storedCellar = [];
 	}
-	storedCellar = [];
-	dispatch('wineUpdated');
+	storedCellar = []; */
 }
 
 //todo update to use wineflat
-function qtyDecrement(e: MouseEvent): void {
-	console.log(`Zyyyyyyyy Wine qtyDecrement - producer: ${producer} - wine:`);
+function qtyDecrementInv(e: MouseEvent): void {
+	$myWineCellarFlat.increaseWineQty(wineFlat['Wine Name'], wineFlat.Inventory[index].Vintage, -1);
+	dispatch('wineUpdated');
+
+	/* console.log(`Zyyyyyyyy Wine qtyDecrement - producer: ${producer} - wine:`);
 	console.log(wineFlat);
 	console.log(`Zyyyyyyy Wine qtyDecrement - wineFlat.Qty: ${invItem[0].Qty}`);
 
@@ -164,14 +182,16 @@ function qtyDecrement(e: MouseEvent): void {
 		storedCellar = [];
 	}
 	storedCellar = [];
-	dispatch('wineUpdated');
+	dispatch('wineUpdated'); */
 }
 
 //setContext('decrement', qtyDecrement);
 
 //todo update to use wineflat
 function deleteWine() {
-	console.log(`Zyyyy Wine deleteWine - wine: ${wineFlat}`);
+	$myWineCellarFlat.removeWineFlat(wineFlat);
+
+	/* console.log(`Zyyyy Wine deleteWine - wine: ${wineFlat}`);
 	console.log(`Zyyyy Wine deleteWine - wineFlat.Qty: ${invItem[0].Qty}`);
 	if (invItem[0].Qty > 0) {
 		invItem[0].Qty = 0;
@@ -198,19 +218,19 @@ function deleteWine() {
 		console.log('dispatching wineUpdated');
 
 		dispatch('wineUpdated');
-	}
+	} */
 }
 </script>
 
-{#if wineFlat && invItem[0]}
+{#if wineFlat && invItem}
 	<Card.Root class="w-[200px] justify-center">
 		<Card.Content class="p-3">
 			<div class="flex flex-col">
 				<div class="flex flex-auto justify-between">
 					<p class="mb-4 text-base">
-						Vintage: {invItem[0].Vintage? invItem[0].Vintage : 'N/A'}
-						<br />Bin: {invItem[0].Bin? invItem[0].Bin : 'N/A'}
-						{#if invItem[0].Purchased}<br />Purchase Date: {invItem[0].Purchased}{/if}
+						Vintage: {invItem.Vintage? invItem.Vintage : 'N/A'}
+						<br />Bin: {invItem.Bin? invItem.Bin : 'N/A'}
+						{#if invItem.Purchased}<br />Purchase Date: {invItem.Purchased}{/if}
 					</p>
 					<button
 						class="variant-soft chip justify-around self-start hover:variant-filled"
@@ -227,9 +247,9 @@ function deleteWine() {
 				>
 				<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
 					<div class="variant-filled bg-secondary-400-500-token btn-group dark:divide-gray-700">
-						<button class="w-12" on:click={qtyDecrement}>-</button>
-						<Label class="w-12 p-2 text-center dark:text-black">{invItem[0].Qty}</Label>
-						<button class="w-12" on:click={qtyIncrement}>+</button>
+						<button class="w-12" on:click={qtyDecrementInv}>-</button>
+						<Label class="w-12 p-2 text-center dark:text-black">{invItem.Qty}</Label>
+						<button class="w-12" on:click={qtyIncrementInv}>+</button>
 					</div>
 				</div>
 			</div>

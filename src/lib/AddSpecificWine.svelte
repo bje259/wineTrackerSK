@@ -80,7 +80,7 @@ function chk(indices: number[], useOr = false) {
 			return Object.is(Math.abs(index), index) ? fOn[index] : !fOn[Math.abs(index)];
 		});
 	}
-};
+}
 
 /*let newWine: Wine = {
 		"Wine Name": "Margaux 2015",
@@ -182,30 +182,32 @@ function openAddPanel() {
  */
 function updateArrayByIndex<T>(arr: T[], index: number, value: T) {
 	return arr.map((v, i) => (i === index ? value : v));
-};
+}
 
 /**
  * @description array of tuples to hold the conditionals and resulting evaluations for the if statements in the UI using the chk function as evaluator (each tuple is an array of two elements - the first element is the conditional statement and the second element is the result of the chk function on the conditional statement)  Here the array is initial with all false values.
  */
-let condIfArray: [number[], boolean][] = 
-[[[0,1],false],
-[[-0,1],false],
-[[-1],false],
-[[2],false],
-[[3],false],
-[[4],false],
-[[0],false],
-[[-0],false]];
+let condIfArray: [number[], boolean][] = [
+	[[0, 1], false],
+	[[-0, 1], false],
+	[[-1], false],
+	[[2], false],
+	[[3], false],
+	[[4], false],
+	[[0], false],
+	[[-0], false]
+];
 
-let rOn: [number[], boolean][] = 
-[[[0,1],false],
-[[-0,1],false],
-[[-1],false],
-[[2],false],
-[[3],false],
-[[4],false],
-[[0],false],
-[[-0],false]];
+let rOn: [number[], boolean][] = [
+	[[0, 1], false],
+	[[-0, 1], false],
+	[[-1], false],
+	[[2], false],
+	[[3], false],
+	[[4], false],
+	[[0], false],
+	[[-0], false]
+];
 
 $: openVerb = openNewWine ? 'Close' : 'Open';
 
@@ -215,7 +217,6 @@ $: {
 	fOn = updateArrayByIndex<boolean>(fOn, 2, newWineName.length > 0);
 	fOn = updateArrayByIndex<boolean>(fOn, 3, newWineVintage > 1980 && newWineVintage < 2024);
 	fOn = updateArrayByIndex<boolean>(fOn, 4, newWineQty > 0);
-
 
 	//fOn[0] = openNewWine;
 	//fOn[1] = newProducerMode;
@@ -231,23 +232,23 @@ $: {
 	fOn = updateArrayByIndex<boolean>(fOn, 2, newWineName.length > 0);
 	fOn = updateArrayByIndex<boolean>(fOn, 3, newWineVintage > 1980 && newWineVintage < 2024);
 	fOn = updateArrayByIndex<boolean>(fOn, 4, newWineQty > 0);
-	
-	condIfArray = 
-	[[[0,1],false],
-	[[-0,1],false],
-	[[-1],false],
-	[[2],false],
-	[[3],false],
-	[[4],false],
-	[[0],false],
-	[[-0],false]];
 
-	rOn = condIfArray.map(cond => [cond[0], chk(cond[0])]);
+	condIfArray = [
+		[[0, 1], false],
+		[[-0, 1], false],
+		[[-1], false],
+		[[2], false],
+		[[3], false],
+		[[4], false],
+		[[0], false],
+		[[-0], false]
+	];
+
+	rOn = condIfArray.map((cond) => [cond[0], chk(cond[0])]);
 
 	//use rOn[0][1] for first if statement
 	//use rOn[1][1] for second if statement, etc.
-};
-
+}
 
 // $: console.log(rOn);
 
@@ -272,9 +273,6 @@ $: newWine = {
 	Notes: newWineNotes
 };
 
-
-
-
 //$: condIfArray = updateArrayByIndex<[number[], boolean]>(condIfArray, [0,1], chk([0, 1]));
 
 /**
@@ -289,6 +287,7 @@ $: newWine = {
  * @param fOn[7] -
  */
 </script>
+
 <!--todo update to incorporate wineflat structure-->
 {#if rOn[1][1]}
 	<div class="flex flex-col items-center justify-center">

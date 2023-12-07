@@ -1,4 +1,3 @@
-// @ts-ignore
 import { WineCellar } from '$lib/WineCellar';
 import { myWineCellar } from '$lib/store';
 import type { Cellar, Wine } from '$lib/types';
@@ -225,12 +224,14 @@ describe('AddSpecificWine intends to allow user interaction to add wins to the c
 	test(' I should be able to submit a new producer', () => {
 		newProducerName = producer;
 		newProducerSubmit();
-		expect(ownedWineCellar.getProducerNames().some( (producer) => producer.name === newProducerName)).toBe(true);
+		expect(
+			ownedWineCellar.getProducerNames().some((producer) => producer.name === newProducerName)
+		).toBe(true);
 	});
 });
 
 function clearText(f: (v: string) => void) {
-    f('');
+	f('');
 }
 
 function newWineSubmit() {
@@ -279,39 +280,35 @@ function newWineSubmit() {
 }
 
 describe('Testing the newWineSubmit form functions', () => {
-    newWine = {
-        'Wine Name': 'Margaux 2015',
-        'Vineyard Location': 'Bordeaux, France',
-        Variety: 'Cabernet Sauvignon',
-        Vintage: 2015,
-        Bin: 'A1',
-        Qty: 10,
-        Purchased: '2020-01-01',
-        Notes: 'Excellent vintage'
-    };
-    producer = 'Chateau Margaux';
-    beforeEach(() => {
-        newWineName = newWine['Wine Name'];
-        newVineyardLocation = newWine['Vineyard Location'];
-        newWineVariety = newWine.Variety;
-        newWineVintage = newWine.Vintage;
-        newWineBin = newWine.Bin;
-        newWineQty = newWine.Qty;
-        newWinePurchased = newWine.Purchased;
-        newWineNotes = newWine.Notes;
-    });
+	newWine = {
+		'Wine Name': 'Margaux 2015',
+		'Vineyard Location': 'Bordeaux, France',
+		Variety: 'Cabernet Sauvignon',
+		Vintage: 2015,
+		Bin: 'A1',
+		Qty: 10,
+		Purchased: '2020-01-01',
+		Notes: 'Excellent vintage'
+	};
+	producer = 'Chateau Margaux';
+	beforeEach(() => {
+		newWineName = newWine['Wine Name'];
+		newVineyardLocation = newWine['Vineyard Location'];
+		newWineVariety = newWine.Variety;
+		newWineVintage = newWine.Vintage;
+		newWineBin = newWine.Bin;
+		newWineQty = newWine.Qty;
+		newWinePurchased = newWine.Purchased;
+		newWineNotes = newWine.Notes;
+	});
 
-test('I should be able to submit a new wine', () => {
-    newWineSubmit();
-    expect(ownedWineCellar.getWinesByProducerWineName(producer, newWineName)).toBeDefined();
-}
-);
+	test('I should be able to submit a new wine', () => {
+		newWineSubmit();
+		expect(ownedWineCellar.getWinesByProducerWineName(producer, newWineName)).toBeDefined();
+	});
 
-test('I should be able to submit a new wine', () => {
-    newWineSubmit();
-    expect(ownedWineCellar.getWinesByProducerWineName(producer, newWineName)).toBeDefined();
-}
-)
-
-
+	test('I should be able to submit a new wine', () => {
+		newWineSubmit();
+		expect(ownedWineCellar.getWinesByProducerWineName(producer, newWineName)).toBeDefined();
+	});
 });

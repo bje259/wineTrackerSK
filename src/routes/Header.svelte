@@ -1,9 +1,4 @@
-<script lang='ts'>
-	import { LightSwitch } from '@skeletonlabs/skeleton';
+<script lang="ts">
 </script>
 
-<header>
-	
-</header>
-
-
+<header></header>

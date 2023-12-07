@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { WineCellar } from './../lib/WineCellar';
-console.log('App.svelte called');
-import {browser} from '$app/environment';
-import InventoryMgmt from '$lib/InventoryMgmt.svelte';
+import { browser } from '$app/environment';
 import WineCellarFlat from '$lib/WineCellarFlat';
 import {
 	myWineCellar,
@@ -11,7 +8,7 @@ import {
 	storeExample,
 	useNewDataType
 } from '$lib/store.js';
-import type { Cellar, CellarFlat, Wine, WineFlat } from '$lib/types';
+import type { Cellar, CellarFlat, Wine } from '$lib/types';
 import { AppBar, LightSwitch } from '@skeletonlabs/skeleton';
 import {
 	Button,
@@ -146,7 +143,7 @@ $: if (browser && !initialQuickload) {
 }
 //todo update to use wineflat
 //rdy for bool
- function loadOwnedWinesFromLocalStorage(): CellarFlat {
+function loadOwnedWinesFromLocalStorage(): CellarFlat {
 	let tmpCellar: CellarFlat = [];
 	if (browser) {
 		console.log('xxxxxloading cell flat from storage store');
@@ -154,8 +151,8 @@ $: if (browser && !initialQuickload) {
 		$myWineCellarFlat.updateCellarFlat(tmpCellar);
 	}
 
-		return tmpCellar;
-	
+	return tmpCellar;
+
 	/*for (let i = 0; localStorage && i < localStorage.length; i++) {
 		const key = localStorage.key(i) || '[]';
 		console.log(`key ${key} in blackList ${blackList.includes(key)}`);
@@ -343,7 +340,6 @@ $: eventListenerStore.subscribe((eventListener) => {
 		});
 	}
 });
-
 </script>
 
 <!--tododecide if drawer is needed for production potential make it dev tools using secret localstorage value-->
@@ -385,10 +381,9 @@ $: eventListenerStore.subscribe((eventListener) => {
 							class="h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
 						/>
 					</svelte:fragment>
-					<SidebarDropdownItem  label="Decrement" />
-					<SidebarDropdownItem  label="Increment" />
-					<SidebarDropdownItem label = "test"/>
-
+					<SidebarDropdownItem label="Decrement" />
+					<SidebarDropdownItem label="Increment" />
+					<SidebarDropdownItem label="test" />
 				</SidebarDropdownWrapper>
 				<SidebarItem label="Kanban" spanClass={spanClass}>
 					<svelte:fragment slot="icon">
@@ -491,13 +486,13 @@ $: eventListenerStore.subscribe((eventListener) => {
 
 <div class="app">
 	<Header></Header>
-	<InventoryMgmt
+	<!--<InventoryMgmt
 				producer = {cellarFlat[0].Producer}
 				wineFlat={cellarFlat[0]}
 				wine={cellar[0][0]}
 				index={0}
 				on:wineUpdated={handleWinesUpdated}
-			/>
+			/>-->
 	<main>
 		<slot />
 	</main>
