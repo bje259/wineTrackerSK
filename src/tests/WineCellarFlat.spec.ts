@@ -1,5 +1,5 @@
-import { WineCellar } from '$lib/WineCellar';
-import { WineCellarFlat } from '$lib/WineCellarFlat';
+import WineCellar from '$lib/WineCellar';
+import WineCellarFlat from '$lib/WineCellarFlat';
 import type { Cellar, CellarFlat, Wine, WineFlat } from '$lib/types';
 import { beforeEach, describe, expect, it, test } from 'vitest';
 

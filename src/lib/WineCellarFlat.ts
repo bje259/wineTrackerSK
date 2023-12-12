@@ -1,17 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { WineCellar } from './WineCellar';
+import type { Unsubscriber } from 'svelte/motion';
+import WineCellar from './WineCellar';
+import { testNewStore } from './store';
 import type { Cellar, CellarFlat, InvItem, SearchParams, Wine, WineFlat } from './types';
-//import { testWineFlat } from './store';
-
 /**
  * @description Checks if an object is iterable.
  * @param obj
  * @returns boolean
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isIterable(obj: any): boolean {
-	return obj != null && typeof obj[Symbol.iterator] === 'function';
-}
 
 /**
  * The WineCellar class represents a collection of wines.
@@ -21,13 +16,13 @@ function isIterable(obj: any): boolean {
  * @see WineCellar
  * @example
  */
-export class WineCellarFlat extends WineCellar {
+export default class WineCellarFlat extends WineCellar {
 	cellarFlat: CellarFlat;
 	filteredCellarFlat: CellarFlat;
 	currentSearchParams: SearchParams;
-	/* tstWineFlatStore: Writable<string>;
+	testStoredWineFlat: WineFlat;
+	defaultWineFlat: WineFlat;
 	unsubscribe: Unsubscriber;
-	tstWineFlat: string; */
 
 	/**
 	 * The WineCellar class represents a collection of wines.
@@ -66,11 +61,24 @@ export class WineCellarFlat extends WineCellar {
 			Purchased: { isActive: false, value: '' },
 			Notes: { isActive: false, value: '' }
 		};
-		/* this.tstWineFlatStore = testWineFlat;
-		this.tstWineFlat = '[]';
-		this.unsubscribe = this.tstWineFlatStore.subscribe((value) => {
-			this.tstWineFlat = value;
-		}); */
+
+		this.defaultWineFlat = {
+			Producer: 'Default Producer',
+			'Wine Name': 'Default Wine Name',
+			'Vineyard Location': 'Default Vineyard Location',
+			Variety: 'Default Variety',
+			Inventory: [
+				{
+					Vintage: 2020,
+					Bin: 'Default Bin',
+					Qty: 0,
+					Purchased: '2020-01-01'
+				}
+			],
+			Notes: 'Default Notes'
+		};
+		this.testStoredWineFlat = this.defaultWineFlat;
+		this.unsubscribe = () => {};
 	}
 
 	/**
@@ -515,6 +523,64 @@ export class WineCellarFlat extends WineCellar {
 		}
 		return false;
 	}
+
+	/**
+	 * update Wine Flat given wine name and vintage
+	 * @param sourceIndex - The index of the wine to be updated.
+	 * @param wineFlat - The wine to be updated.
+	 * @returns True if the wine was successfully updated, false otherwise.
+	 * @see WineFlat
+	 * @see CellarFlat
+	 */
+	updateWineFlat(sourceIndex: number, wineFlat: WineFlat): boolean {
+		let itemIndex = -1;
+		let wineName = wineFlat['Wine Name'];
+		let vintage = wineFlat.Inventory[sourceIndex].Vintage;
+		this.unsubscribe = testNewStore.subscribe((value) => {
+			this.testStoredWineFlat = value || this.defaultWineFlat;
+		});
+		if (this.cellarFlat) {
+			const currentCellarFlat = this.cellarFlat;
+			const index = this.cellarFlat.findIndex(
+				(w) =>
+					w['Wine Name'] === wineName &&
+					w.Inventory.findIndex((v, i, obj) => {
+						if (v.Vintage === vintage) {
+							itemIndex = i;
+							return true;
+							// note in the next line, we are allowing for the case where the vintage is not found intentionally
+						}
+					}) !== undefined &&
+					w.Producer === wineFlat.Producer
+			);
+			console.log('index: ' + index);
+			console.log('itemIndex: ' + itemIndex);
+			this.testStoredWineFlat = wineFlat;
+			testNewStore.update((value) => {
+				value = wineFlat;
+				return value;
+			});
+			this.unsubscribe();
+			console.log('wineFlat: ' + JSON.stringify(wineFlat), null, 2);
+			if (index !== -1) {
+				if (itemIndex !== -1) {
+					currentCellarFlat[index].Inventory[itemIndex] = wineFlat.Inventory[sourceIndex];
+					this.cellarFlat = currentCellarFlat;
+					return true;
+				} else {
+					currentCellarFlat[index].Inventory.push(wineFlat.Inventory[sourceIndex]);
+					this.cellarFlat = currentCellarFlat;
+					return true;
+				}
+			} else if (index === -1) {
+				currentCellarFlat.push(wineFlat);
+				this.cellarFlat = currentCellarFlat;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	//use filter function for flatwine version
 	/**
 	 * Retrieves an array of wines by the specified producer.
@@ -685,7 +751,7 @@ export class WineCellarFlat extends WineCellar {
 			producers.push({ name: wines.Producer, value: wines.Producer });
 		}
 		console.log(producers);
-		console.log('get producer names mid moethod:');
+		console.log('get producer names mid method:');
 		const uniqueProducers = producers.filter(
 			(v, i, a) => a.findIndex((t) => t.name === v.name) === i
 		);
@@ -1289,12 +1355,12 @@ export class WineCellarFlat extends WineCellar {
 	increaseWineQty(wineName: string, vintage: number, qty: number): boolean {
 		let wineFlat: WineFlat | undefined = undefined;
 		let indices = { wineIndex: -1, invIndex: -1 };
-		let currentWineFlat: WineFlat;
+
 		try {
 			wineFlat = this.checkWineByNameVintageFlat(wineName, vintage);
 			console.log('qty chg: wine flat');
 			console.log(wineFlat);
-
+			this.testStoredWineFlat = wineFlat ?? this.defaultWineFlat;
 			if (wineFlat === undefined) {
 				//throw new Error('wine not found');
 			}
@@ -1323,8 +1389,6 @@ export class WineCellarFlat extends WineCellar {
 
 	// Additional utility methods can be added as needed
 }
-
-export default WineCellarFlat;
 
 // Example usage:
 // const myCellarFlat = new WineCellarFlat();

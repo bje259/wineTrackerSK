@@ -5,6 +5,7 @@ import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
 export const ownedWinesString = writable(''); // New store for ownedWinesString
 export const useNewDataType = writable(true);
+export const nextId: Writable<number> = localStorageStore('nextId', 5);
 export const storeExample: Writable<string> = localStorageStore('storeExample', '[]');
 export const testNewStore = persisted('testNew', {
 	Producer: 'Chateau Margaux',

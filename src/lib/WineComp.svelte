@@ -1,9 +1,10 @@
 <script lang="ts">
 //import WineCellar from './WineCellar';
 import { createEventDispatcher } from 'svelte';
+import { myWineCellar, myWineCellarFlat } from './ClassStores';
 import InventoryMgmt from './InventoryMgmt.svelte';
 import WineCellarFlat from './WineCellarFlat';
-import { myWineCellar, myWineCellarFlat, storeExample } from './store';
+import { storeExample } from './store';
 import type { CellarFlat, Wine, WineFlat } from './types';
 
 // increment the value of the input field
@@ -171,7 +172,6 @@ function deleteWine() {
 			<InventoryMgmt
 				producer={producer}
 				wineFlat={wineFlat}
-				wine={wine}
 				index={index}
 				on:wineUpdated={handleWineUpdated}
 			/>

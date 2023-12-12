@@ -1,14 +1,9 @@
 <script lang="ts">
 import { browser } from '$app/environment';
+import { myWineCellar, myWineCellarFlat } from '$lib/ClassStores';
 import InventoryMgmt from '$lib/InventoryMgmt.svelte';
 import * as Card from '$lib/components/ui/card';
-import {
-	myWineCellar,
-	myWineCellarFlat,
-	ownedWinesString,
-	storeExample,
-	useNewDataType
-} from '$lib/store';
+import { ownedWinesString, storeExample, useNewDataType } from '$lib/store';
 import type { CellarFlat, Wine, WineFlat } from '$lib/types';
 import { Label } from 'flowbite-svelte';
 import { createEventDispatcher } from 'svelte';

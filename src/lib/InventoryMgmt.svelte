@@ -6,7 +6,7 @@ import type { InvItem, Wine, WineFlat } from '$lib/types';
 import { Label } from 'flowbite-svelte';
 import { createEventDispatcher, onMount } from 'svelte';
 export let producer: string = '';
-export let wine: Wine = {} as Wine;
+export const _wine: Wine = {} as Wine;
 export let index: number = 0;
 export let wineFlat: WineFlat;
 
@@ -59,7 +59,7 @@ onMount(() => {
 		Qty: 0,
 		Purchased: ''
 	};
-	currentQty = invItem.Qty;
+	currentQty = invItem.Qty ? invItem.Qty : currentQty;
 	console.log('Zyyyyyyyoriginl mounted InvMgmt wineFlat:', wineFlat);
 	//console.log(wineFlat);
 	console.log('Zyyyyindex receivd?', index);
@@ -159,9 +159,9 @@ function qtyIncrementInv(e: MouseEvent) {
 	storedCellar = []; */
 }
 
-$: currentQty = invItem.Qty;
+$: if (invItem.Qty) currentQty = invItem.Qty;
 
-$: wineFlat.Inventory[index] = invItem;
+$: wineFlat.Inventory[index] = invItem ? invItem : wineFlat.Inventory[index];
 
 $testNewStore.Inventory[index] = invItem;
 
@@ -270,7 +270,7 @@ function deleteWine() {
 				>
 				<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
 					<div class="variant-filled bg-secondary-400-500-token btn-group dark:divide-gray-700">
-						<button class="w-12" on:click={qtyDecrementInv}>-</button>
+						<button name="plusButton" class="w-12" on:click={qtyDecrementInv}>-</button>
 						<Label bind:value={currentQty} class="w-12 p-2 text-center dark:text-black" />
 						<button class="w-12" on:click={qtyIncrementInv}>+</button>
 					</div>

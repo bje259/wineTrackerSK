@@ -1,6 +1,6 @@
 import { skeleton } from '@skeletonlabs/tw-plugin';
-import { fontFamily } from 'tailwindcss/defaultTheme';
 import { join } from 'path';
+import { fontFamily } from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
@@ -11,6 +11,7 @@ const config = {
 		join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
 	],
 	plugins: [
+		require('@tailwindcss/forms'),
 		require('flowbite/plugin'),
 		skeleton({
 			themes: {

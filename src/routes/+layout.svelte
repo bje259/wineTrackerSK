@@ -1,13 +1,8 @@
 <script lang="ts">
 import { browser } from '$app/environment';
+import { myWineCellar, myWineCellarFlat } from '$lib/ClassStores';
 import WineCellarFlat from '$lib/WineCellarFlat';
-import {
-	myWineCellar,
-	myWineCellarFlat,
-	ownedWinesString,
-	storeExample,
-	useNewDataType
-} from '$lib/store.js';
+import { ownedWinesString, storeExample, useNewDataType } from '$lib/store.js';
 import type { Cellar, CellarFlat, Wine } from '$lib/types';
 import { AppBar, LightSwitch } from '@skeletonlabs/skeleton';
 import {
@@ -53,7 +48,7 @@ let transitionParams = {
 // import EventTarget from 'svelte';
 
 const eventListenerStore: Writable<EventTarget> = writable();
-const debugMode = false;
+const debugMode = true;
 setContext('eventListener', eventListenerStore);
 setContext('debugMode', debugMode);
 //let ownedWinesString = "";
@@ -82,11 +77,6 @@ let importModal = false;
 let exportModal = false;
 const dispatch = createEventDispatcher();
 
-function isIterable(obj: any) {
-	return obj != null && typeof obj[Symbol.iterator] === 'function';
-}
-
-//todo update to use wineflat
 //rdy for bool
 function loadOwnedWinesInitial(): Cellar {
 	const loadedOwnedWines: Cellar = {};
@@ -107,7 +97,7 @@ function loadOwnedWinesInitial(): Cellar {
 			console.log('init loadfromstorage key ' + key);
 			if (values) {
 				try {
-					if (JSON.parse(values).length > 10 || !isIterable(JSON.parse(values))) continue;
+					if (JSON.parse(values).length > 10) continue;
 					loadedOwnedWines[key] = JSON.parse(values) as Wine[];
 					count += loadedOwnedWines[key].length || 0;
 				} catch (error) {
@@ -141,7 +131,7 @@ $: if (browser && !initialQuickload) {
 	$myWineCellar.updateCellar(loadOwnedWinesInitial());
 	//invalidateAll();
 }
-//todo update to use wineflat
+
 //rdy for bool
 function loadOwnedWinesFromLocalStorage(): CellarFlat {
 	let tmpCellar: CellarFlat = [];
@@ -174,7 +164,6 @@ function loadOwnedWinesFromLocalStorage(): CellarFlat {
 	return loadedOwnedWines;*/
 }
 
-//todo update to use wineflat
 //rdy for bool
 function handleWinesUpdated() {
 	// Update the local data or trigger a refresh
@@ -375,6 +364,13 @@ $: eventListenerStore.subscribe((eventListener) => {
 						/>
 					</svelte:fragment>
 				</SidebarItem>
+				<SidebarItem label="Beta" href="/Beta">
+					<svelte:fragment slot="icon">
+						<UsersSolid
+							class="h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+						/>
+					</svelte:fragment>
+				</SidebarItem>
 				<SidebarDropdownWrapper label="Button Testing">
 					<svelte:fragment slot="icon">
 						<ShoppingCartSolid
@@ -493,7 +489,7 @@ $: eventListenerStore.subscribe((eventListener) => {
 				index={0}
 				on:wineUpdated={handleWinesUpdated}
 			/>-->
-	<main>
+	<main class="m-7">
 		<slot />
 	</main>
 
@@ -501,6 +497,7 @@ $: eventListenerStore.subscribe((eventListener) => {
 </div>
 
 <style>
+
 /* .app {
 	display: flex;
 	flex-direction: column;

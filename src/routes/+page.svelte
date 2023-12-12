@@ -1,15 +1,17 @@
 <script lang="ts">
 import { browser } from '$app/environment';
-import { Skeleton } from '$lib/components/ui/skeleton';
 import AddSpecificWine from '$lib/AddSpecificWine.svelte';
+import { myWineCellar } from '$lib/ClassStores';
 import WineCellarFlat from '$lib/WineCellarFlat';
 import WineComp from '$lib/WineComp.svelte';
-import { myWineCellar, myWineCellarFlat, storeExample, useNewDataType } from '$lib/store.js';
+import { Skeleton } from '$lib/components/ui/skeleton';
+import { storeExample, useNewDataType } from '$lib/store';
 import type { Cellar, CellarFlat, Wine, WineFlat } from '$lib/types';
 import { Button, CloseButton, Input, Select } from 'flowbite-svelte';
 import { createEventDispatcher, onMount } from 'svelte';
 import type { Writable } from 'svelte/store';
 import '../app.pcss';
+import { myWineCellarFlat } from '../lib/ClassStores';
 import './styles.css';
 //import type {EventTarget} from 'svelte';
 //todo update to use wineflat
@@ -22,7 +24,7 @@ let selectedProducer = '';
 let selectedVariety = '';
 let selectedVineyard = '';
 //let ownedWinesString = "";
-let debugMode = false;
+let debugMode = true;
 let searchParams: { [paramName: string]: { name: string; value: string }[] } = {
 	producer: [{ name: 'All Producers', value: '' }],
 	variety: [{ name: 'All Varieties', value: '' }],
@@ -53,10 +55,6 @@ $: debugMode = getContext('debugMode');
 //functions
 function clearSearch(setter: (value: string) => void): void {
 	setter('');
-}
-
-function isIterable(obj: Function) {
-	return obj != null && typeof obj !== 'undefined';
 }
 
 // todo this shouldn't need to happen twice skip myWinceCellar.updateCellar
@@ -190,7 +188,7 @@ function loadOwnedWinesFromLocalStorage(): Cellar {
 			console.log('loadfromstorage key ' + key);
 			if (values) {
 				try {
-					if (!isIterable(JSON.parse(values))) continue;
+					if (JSON.parse(values)) continue;
 					loadedOwnedWines[key] = JSON.parse(values) as Wine[];
 				} catch (error) {
 					console.error(`Error parsing data for key "${key}":`, error);

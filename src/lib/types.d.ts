@@ -147,3 +147,56 @@ export interface SearchParams {
 	Qty?: SearchParam;
 	SearchTerm?: SearchParam;
 }
+
+export interface Bottle {
+	Id: number;
+	Producer: string;
+	Name: string;
+	Varietal: string;
+	Vintage: number;
+	VineyardLoc: string;
+	VineyardName: string;
+	Bin: string;
+	Purchased: string;
+	Consumed?: string;
+	Notes: string;
+}
+
+/**
+ * @description Test Bottle interface
+ * @interface TBottle
+ * @property {number} Id - The id of the bottle.
+ * @property {string} Producer - The name of the producer.
+ * @property {string} Name - The name of the wine.
+ * @property {number} Vintage - The vintage of the wine.
+ * @property {string} Purchased - The date when the wine was purchased.
+ * @property {string} Consumed - (Optional) The date when the wine was consumed.
+ * @see TBottles
+ * @see Bottles
+ */
+export interface TBottle {
+	Id: number;
+	Producer: string;
+	Name: string;
+	Vintage: number;
+	Purchased: string;
+	Consumed: string;
+}
+
+export type TBottles = TBottle[];
+
+export type Bottles = Bottle[];
+
+
+export interface ShowBottleFields {
+	Producer: boolean;
+	Name: boolean;
+	Varietal: boolean;
+	Vintage: boolean;
+	VineyardLoc: boolean;
+	VineyardName: boolean;
+	Bin: boolean;
+	Purchased: boolean;
+	Consumed: boolean;
+	Notes: boolean;
+}
