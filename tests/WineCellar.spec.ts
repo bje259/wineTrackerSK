@@ -1,8 +1,8 @@
 /* eslint-disable */
 // @ts-nocheck
-import { beforeEach, describe, expect, it, test } from 'vitest';
-import { WineCellar } from '$lib/WineCellar';
+import WineCellar from '$lib/WineCellar';
 import type { Cellar, Wine } from '$lib/types';
+import { beforeEach, describe, expect, it, test } from 'vitest';
 
 describe('WineCellar', () => {
 	let wineCellar: WineCellar;

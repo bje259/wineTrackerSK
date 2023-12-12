@@ -1,14 +1,15 @@
 <script lang="ts">
+import { myWineCellarFlat } from '$lib/ClassStores';
 import * as Card from '$lib/components/ui/card';
-import { myWineCellarFlat } from '$lib/store';
+import { testNewStore } from '$lib/store';
 import type { InvItem, Wine, WineFlat } from '$lib/types';
 import { Label } from 'flowbite-svelte';
 import { createEventDispatcher, onMount } from 'svelte';
-import { localStorageStore } from '@skeletonlabs/skeleton';
 export let producer: string = '';
 export let wine: Wine = {} as Wine;
-export let index: number;
+export let index: number = 0;
 export let wineFlat: WineFlat;
+
 /*{
 	Producer: '',
 	'Wine Name': '',
@@ -26,11 +27,11 @@ export let wineFlat: WineFlat;
 };*/
 
 let invItem = {} as InvItem;
-
+let currentQty = 0;
 const dispatch = createEventDispatcher();
 //todo update to use wineflat
-let tempWines: Wine[] = [];
-let tempWinesFlat: WineFlat[] = [];
+// let tempWines: Wine[] = [];
+// let tempWinesFlat: WineFlat[] = [];
 //$: ownedWines = $myWineCellar.getWinesByProducer(producer) || [];
 
 //todo update to use wineflat
@@ -47,32 +48,32 @@ let tempWinesFlat: WineFlat[] = [];
 		current.updateCellarByProducer(producer, tempWines);
 		return current;
 	});
-	tempWines = []; */
+	tempWines = [];
 dispatch('wineUpdated');
-/* } */
+} */
 
 onMount(() => {
 	invItem = wineFlat.Inventory[index] ?? {
-		Vintage: wineFlat.Inventory[index].Vintage,
-		Bin: wineFlat.Inventory[index].Bin,
-		Qty: wineFlat.Inventory[index].Qty,
-		Purchased: wineFlat.Inventory[index].Purchased
+		Vintage: 0,
+		Bin: '',
+		Qty: 0,
+		Purchased: ''
 	};
-	let vint = 0;
+	currentQty = invItem.Qty;
 	console.log('Zyyyyyyyoriginl mounted InvMgmt wineFlat:', wineFlat);
 	//console.log(wineFlat);
 	console.log('Zyyyyindex receivd?', index);
 	//console.log(index);
-	const tmpWine: Wine | undefined = $myWineCellarFlat.checkWineByNameVintage(
+	/* const tmpWine: Wine | undefined = $myWineCellarFlat.checkWineByNameVintage(
 		wine['Wine Name'],
 		vint as number
-	);
-	const tmpWineFlat: WineFlat | undefined = $myWineCellarFlat.checkWineByNameVintageFlat(
+	); */
+	/* const tmpWineFlat: WineFlat | undefined = $myWineCellarFlat.checkWineByNameVintageFlat(
 		wineFlat['Wine Name'],
 		vint as number
-	);
-	producer = 'Chateau Margaux';
-	wine = {
+	); */
+	producer = producer ?? 'Chateau Margaux';
+	/* wine = {
 		'Wine Name': 'Margaux 2015',
 		'Vineyard Location': 'Bordeaux, France',
 		Variety: 'Cabernet Sauvignon',
@@ -81,7 +82,7 @@ onMount(() => {
 		Qty: 10,
 		Purchased: '2020-01-01',
 		Notes: 'Excellent vintage'
-	};
+	}; */
 	/* invItem = [
 		{
 			Vintage: 2015,
@@ -102,15 +103,31 @@ function qtyIncrementInv(e: MouseEvent) {
 	console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`);
 	console.log(JSON.stringify(wineFlat, null, 2));
 
-	$myWineCellarFlat.increaseWineQty(wineFlat['Wine Name'], wineFlat.Inventory[index].Vintage, 1);
+	// increase local qty by 1
+	invItem.Qty = invItem.Qty + 1;
+
+	// update localStorageStore
+	const storedTestWine: WineFlat = $testNewStore;
+	storedTestWine.Inventory[index].Qty = invItem.Qty;
+
+	// update myWineCellarFlat
+	myWineCellarFlat.update((current) => {
+		if (current.updateWineFlat(index, wineFlat)) {
+			console.log('Zyyyyyyy Wine qtyIncrement - updated myWineCellarFlat');
+		} else {
+			console.log('Zyyyyyyy Wine qtyIncrement - failed to update myWineCellarFlat');
+		}
+		current = current;
+		return current;
+	});
+	$testNewStore = storedTestWine;
+	// dispatch wineUpdated
 	dispatch('wineUpdated');
-
-	/* console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`,producer, wineFlat);
+	console.log(`Zyyyyyyy Wine qtyIncrement - producer: - wine:`, producer, wineFlat);
 	//console.log(wineFlat);
-	console.log(`Zyyyyyyyy Wine qtyIncrement - wineFlat.Qty: for index`,index,invItem[0].Qty);
+	console.log(`Zyyyyyyyy Wine qtyIncrement - wineFlat.Qty: for index`, index, invItem.Qty);
 
-	invItem[0].Qty = invItem[0].Qty + 1;
-	console.log(`Zyyyyyyy Wine qtyIncrement - wineFlat.Qty: `,invItem[0].Qty);
+	/* console.log(`Zyyyyyyy Wine qtyIncrement - wineFlat.Qty: `,invItem[0].Qty);
 	let storedCellar: CellarFlat = [];
 	try {
 		storedCellar = (JSON.parse($storeExample) as CellarFlat) ?? [];
@@ -141,6 +158,12 @@ function qtyIncrementInv(e: MouseEvent) {
 	}
 	storedCellar = []; */
 }
+
+$: currentQty = invItem.Qty;
+
+$: wineFlat.Inventory[index] = invItem;
+
+$testNewStore.Inventory[index] = invItem;
 
 //todo update to use wineflat
 function qtyDecrementInv(e: MouseEvent): void {
@@ -228,8 +251,8 @@ function deleteWine() {
 			<div class="flex flex-col">
 				<div class="flex flex-auto justify-between">
 					<p class="mb-4 text-base">
-						Vintage: {invItem.Vintage? invItem.Vintage : 'N/A'}
-						<br />Bin: {invItem.Bin? invItem.Bin : 'N/A'}
+						Vintage: {invItem.Vintage}
+						<br />Bin: {invItem.Bin}
 						{#if invItem.Purchased}<br />Purchase Date: {invItem.Purchased}{/if}
 					</p>
 					<button
@@ -248,7 +271,7 @@ function deleteWine() {
 				<div class="inset-0 top-0 col-span-3 row-span-1 inline-flex border-l-transparent">
 					<div class="variant-filled bg-secondary-400-500-token btn-group dark:divide-gray-700">
 						<button class="w-12" on:click={qtyDecrementInv}>-</button>
-						<Label class="w-12 p-2 text-center dark:text-black">{invItem.Qty}</Label>
+						<Label bind:value={currentQty} class="w-12 p-2 text-center dark:text-black" />
 						<button class="w-12" on:click={qtyIncrementInv}>+</button>
 					</div>
 				</div>

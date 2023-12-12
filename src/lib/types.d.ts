@@ -35,8 +35,8 @@
  * // }
  */
 export interface Wine {
-	"Wine Name": string;
-	"Vineyard Location"?: string;
+	'Wine Name': string;
+	'Vineyard Location'?: string;
 	Variety?: string;
 	Vintage: number;
 	Bin?: string;
@@ -119,7 +119,6 @@ export interface SearchParam {
 	isActive: boolean;
 	value: string | number;
 }
-
 
 /**
  * SearchParams interface represents the search parameters.

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Button, CloseButton, Input, Label, NumberInput } from 'flowbite-svelte';
 import { createEventDispatcher } from 'svelte';
-import { myWineCellar } from './store';
+import { myWineCellar } from './ClassStores';
 import type { Wine } from './types';
 
 const dispatch = createEventDispatcher();

@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { AlertDialog as AlertDialogPrimitive } from "bits-ui";
-	import { buttonVariants } from "$lib/components/ui/button";
-	import { cn } from "$lib/utils";
+import { AlertDialog as AlertDialogPrimitive } from 'bits-ui';
+import { buttonVariants } from '$lib/components/ui/button';
+import { cn } from '$lib/utils';
 
-	type $$Props = AlertDialogPrimitive.CancelProps;
-	type $$Events = AlertDialogPrimitive.CancelEvents;
+type $$Props = AlertDialogPrimitive.CancelProps;
+type $$Events = AlertDialogPrimitive.CancelEvents;
 
-	let className: $$Props["class"] = undefined;
-	export { className as class };
+let className: $$Props['class'] = undefined;
+export { className as class };
 </script>
 
 <AlertDialogPrimitive.Cancel
@@ -21,5 +21,5 @@
 	on:keydown
 	let:builder
 >
-	<slot {builder} />
+	<slot builder={builder} />
 </AlertDialogPrimitive.Cancel>

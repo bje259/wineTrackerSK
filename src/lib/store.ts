@@ -1,11 +1,23 @@
-import WineCellar from '$lib/WineCellar';
-import WineCellarFlat from '$lib/WineCellarFlat';
+import type { WineFlat } from '$lib/types';
 import { localStorageStore } from '@skeletonlabs/skeleton';
+import { persisted } from 'svelte-persisted-store';
 import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
-export const myWineCellar = writable(new WineCellar()); // New store for myWineCellar
-export const myWineCellarFlat = writable(new WineCellarFlat());
 export const ownedWinesString = writable(''); // New store for ownedWinesString
 export const useNewDataType = writable(true);
 export const storeExample: Writable<string> = localStorageStore('storeExample', '[]');
-//export const testWineFlat: Writable<string> = localStorageStore('testWineFlat', '[]');
+export const testNewStore = persisted('testNew', {
+	Producer: 'Chateau Margaux',
+	'Wine Name': 'Margaux 2015',
+	'Vineyard Location': 'Bordeaux, France',
+	Variety: 'Cabernet Sauvignon',
+	Inventory: [
+		{
+			Vintage: 2015,
+			Bin: 'A1',
+			Qty: 10,
+			Purchased: '2020-01-01'
+		}
+	],
+	Notes: 'Excellent vintage'
+} as WineFlat);

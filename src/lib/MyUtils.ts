@@ -1,9 +1,9 @@
 /**
  * @module MyUtils
-*/
+ */
 
 /**
- * @function 
+ * @function
  * @param {string} str
  * @returns {string}
-*/
+ */

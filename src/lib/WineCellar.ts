@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Cellar, CellarFlat, Wine, WineFlat } from './types';
 
 /**
@@ -7,11 +5,7 @@ import type { Cellar, CellarFlat, Wine, WineFlat } from './types';
  * @param obj
  * @returns boolean
  */
-function isIterable(obj: any): boolean {
-	return obj != null && typeof obj[Symbol.iterator] === 'function';
-}
 
-//todo
 //TODO
 //@todo
 // @TODO
@@ -24,7 +18,7 @@ function isIterable(obj: any): boolean {
  * @example
  * @todo convert to store data in new flat datatypes
  */
-export class WineCellar {
+export default class WineCellar {
 	cellar: Cellar;
 
 	/**
@@ -379,7 +373,7 @@ export class WineCellar {
 	 */
 	getProducerNames(): { name: string; value: string }[] {
 		const producers: { name: string; value: string }[] = [];
-		if (!isIterable(producers)) return [];
+
 		for (const producer in this.cellar) {
 			producers.push({ name: producer, value: producer });
 		}
@@ -397,7 +391,6 @@ export class WineCellar {
 	getVarietyNames(): { name: string; value: string }[] {
 		const varieties = [];
 		for (const producer in this.cellar) {
-			if (!isIterable(this.cellar[producer])) continue;
 			for (const wine of this.cellar[producer]) {
 				if (wine.Variety) {
 					varieties.push({ name: wine.Variety, value: wine.Variety });
@@ -418,7 +411,6 @@ export class WineCellar {
 	getVineyardNames(): { name: string; value: string }[] {
 		const vineyards = [];
 		for (const producer in this.cellar) {
-			if (!isIterable(this.cellar[producer])) continue;
 			for (const wine of this.cellar[producer]) {
 				if (wine['Vineyard Location']) {
 					vineyards.push({ name: wine['Vineyard Location'], value: wine['Vineyard Location'] });
@@ -635,8 +627,6 @@ export class WineCellar {
 
 	// Additional utility methods can be added as needed
 }
-
-export default WineCellar;
 
 // Example usage:
 const myCellar = new WineCellar();

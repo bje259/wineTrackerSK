@@ -1,11 +1,11 @@
 <script lang="ts">
-	import * as Select from "$lib/components/ui/select";
-	import { getFormField } from "formsnap";
-	import type { Select as SelectPrimitive } from "bits-ui";
-
-	type $$Props = SelectPrimitive.Props;
-	const { setValue, name, value } = getFormField();
-	export let onSelectedChange: $$Props["onSelectedChange"] = undefined;
+import * as Select from '$lib/components/ui/select';
+import type { Select as SelectPrimitive } from 'bits-ui';
+import { getFormField } from 'formsnap';
+type SelectedType = any; // replace 'any' with the actual type
+type $$Props = SelectPrimitive.Props<SelectedType>;
+const { setValue, name, value } = getFormField();
+export let onSelectedChange: $$Props['onSelectedChange'] = undefined;
 </script>
 
 <Select.Root
@@ -16,5 +16,5 @@
 	{...$$restProps}
 >
 	<slot />
-	<input hidden {name} value={$value} />
+	<input hidden name={name} value={$value} />
 </Select.Root>

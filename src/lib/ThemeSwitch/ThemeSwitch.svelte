@@ -1,30 +1,30 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
+import { browser } from '$app/environment';
 
-	let darkMode = true;
+let darkMode = true;
 
-	function handleSwitchDarkMode() {
-		darkMode = !darkMode;
+function handleSwitchDarkMode() {
+	darkMode = !darkMode;
 
-		localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+	localStorage.setItem('theme', darkMode ? 'dark' : 'light');
 
-		darkMode
-			? document.documentElement.classList.add('dark')
-			: document.documentElement.classList.remove('dark');
+	darkMode
+		? document.documentElement.classList.add('dark')
+		: document.documentElement.classList.remove('dark');
+}
+
+if (browser) {
+	if (
+		localStorage.theme === 'dark' ||
+		(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+	) {
+		document.documentElement.classList.add('dark');
+		darkMode = true;
+	} else {
+		document.documentElement.classList.remove('dark');
+		darkMode = false;
 	}
-
-	if (browser) {
-		if (
-			localStorage.theme === 'dark' ||
-			(!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-		) {
-			document.documentElement.classList.add('dark');
-			darkMode = true;
-		} else {
-			document.documentElement.classList.remove('dark');
-			darkMode = false;
-		}
-	}
+}
 </script>
 
 <div>
@@ -32,7 +32,7 @@
 	<label for="theme-toggle" />
 </div>
 
-<style lang="postcss">
+<!-- <style lang="postcss">
 	#theme-toggle {
 		@apply invisible;
 	}
@@ -49,4 +49,4 @@
 		@apply bg-transparent;
 		box-shadow: inset -18px -16px 1px 1px #fff;
 	}
-</style>
+</style> -->
